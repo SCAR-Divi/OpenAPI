@@ -38,9 +38,14 @@ type
   TExtArray = array of Extended;
 
   ///	<summary>
-  ///	  A 2-dimensional array of extended values.
+  ///	  A 2-dimensional dynamic array of Extended values.
   ///	</summary>
   T2DExtArray = array of TExtArray;
+
+  ///	<summary>
+  ///	  A dynamic array of Integer values.
+  ///	</summary>
+  TIntArray = array of Integer;
 
 implementation
 
