@@ -3,36 +3,56 @@ unit OpenAPI.TPA;
 interface
 
 uses
-  System.Types, System.Math,
+  System.Types, System.Math, System.SysUtils,
 
   {$IFDEF EXPORTS}uPSComponent, uEngine_PascalScript,{$ENDIF}
 
   OpenAPI.Globals;
 
+type
+  {$REGION 'Documentation'}
+  ///	<summary>
+  ///	  A simple alias of the Exception class to identify errors thrown by TPA functions.
+  ///	</summary>
+  {$ENDREGION}
+  ETPAException = class(Exception);
+
+{$REGION 'Documentation'}
 ///	<summary>
 ///	  Sorts a given set of points by their Euclidean distance from the origin at 0, 0 by using the
 ///	  ShellSort sorting algorithm.
 ///	</summary>
 ///	<param name="TPA">
-///	  The unsorted TPointArray, which will be sorted.
+///	  The unsorted <see cref="OpenAPI.Globals|TPointArray" />, which will be sorted.
 ///	</param>
+///	<remarks>
+///	  SortTPA calls SortTPAEx internally by referencing the point at 0, 0 as offset.
+///	  <code lang="Delphi">
+///	SortTPAEx(TPA, Point(0, 0));</code>
+///	</remarks>
+///	<seealso cref="SortTPAEx" />
+{$ENDREGION}
 procedure SortTPA(var TPA: TPointArray);
 
+{$REGION 'Documentation'}
 ///	<summary>
 ///	  Sorts a given set of points by their Euclidean distance from a given point by using the
 ///	  ShellSort sorting algorithm.
 ///	</summary>
 ///	<param name="TPA">
-///	  The unsorted TPointArray, which will be sorted.
+///	  The unsorted <see cref="OpenAPI.Globals|TPointArray" />, which will be sorted.
 ///	</param>
 ///	<param name="Point">
 ///	  The refence point used to calculate distances.
 ///	</param>
+///	<seealso cref="SortTPA" />
+{$ENDREGION}
 procedure SortTPAEx(var TPA: TPointArray; const Point: TPoint);
 
+{$REGION 'Documentation'}
 ///	<summary>
-///	  Combines 2 TPointArrays by appending one to the other and returning the resulting new
-///	  TPointArray.
+///	  Combines 2 <see cref="OpenAPI.Globals|TPointArray">TPointArrays</see> by appending one to the
+///	  other and returning the resulting new <see cref="OpenAPI.Globals|TPointArray" />.
 ///	</summary>
 ///	<param name="TPA1">
 ///	  The first TPointArray.
@@ -43,8 +63,10 @@ procedure SortTPAEx(var TPA: TPointArray; const Point: TPoint);
 ///	<returns>
 ///	  A TPointArray containing TPA1 with TPA2 appended to the end.
 ///	</returns>
+{$ENDREGION}
 function CombineTPA(const TPA1, TPA2: TPointArray): TPointArray;
 
+{$REGION 'Documentation'}
 ///	<summary>
 ///	  Returns True if the given TPA has zero elements.
 ///	</summary>
@@ -54,13 +76,15 @@ function CombineTPA(const TPA1, TPA2: TPointArray): TPointArray;
 ///	<returns>
 ///	  True if TPA has zero elements, False in any other case.
 ///	</returns>
+{$ENDREGION}
 function TPAEmpty(const TPA: TPointArray): Boolean;
 
+{$REGION 'Documentation'}
 ///	<summary>
-///	  Offsets the coordindates of a given TPointArray.
+///	  Offsets the coordindates of a given <see cref="OpenAPI.Globals|TPointArray" />.
 ///	</summary>
 ///	<param name="TPA">
-///	  The TPointArray to be offset.
+///	  The <see cref="OpenAPI.Globals|TPointArray" /> to be offset.
 ///	</param>
 ///	<param name="XOffset">
 ///	  The x-coordinate offset value.
@@ -68,31 +92,37 @@ function TPAEmpty(const TPA: TPointArray): Boolean;
 ///	<param name="YOffset">
 ///	  The y-coordinate offset value.
 ///	</param>
+{$ENDREGION}
 procedure OffsetTPA(var TPA: TPointArray; const XOffset, YOffset: Integer); inline;
 
+{$REGION 'Documentation'}
 ///	<summary>
-///	  Returns a copy of a given TPointArray.
+///	  Returns a copy of a given <see cref="OpenAPI.Globals|TPointArray" />.
 ///	</summary>
 ///	<param name="TPA">
-///	  The TPointArray to copy.
+///	  The <see cref="OpenAPI.Globals|TPointArray" /> to copy.
 ///	</param>
 ///	<returns>
-///	  A new TPointArray with copies of all original values in TPA.
+///	  A new <see cref="OpenAPI.Globals|TPointArray" /> with copies of all original values in TPA.
 ///	</returns>
 ///	<remarks>
-///	  This function is used to create copies of TPointArrays as arrays are passed by reference and
-///	  cannot be duplicated by assignment.
+///	  This function is used to create copies of
+///	  <see cref="OpenAPI.Globals|TPointArray">TPointArrays</see> as arrays are passed by reference
+///	  and cannot be duplicated by assignment.
 ///	</remarks>
+///	<seealso cref="CopyTPAEx" />
+{$ENDREGION}
 function CopyTPA(const TPA: TPointArray): TPointArray;
 
+{$REGION 'Documentation'}
 ///	<summary>
-///	  Returns a subset of a given TPointArray.
+///	  Returns a subset of a given <see cref="OpenAPI.Globals|TPointArray" />.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The TPointArray to copy.
 ///	</param>
 ///	<param name="Index">
-///	  The index from which to start copying the TPointArray.
+///	  The index from which to start copying the <see cref="OpenAPI.Globals|TPointArray" />.
 ///	</param>
 ///	<param name="Count">
 ///	  The number of items to copy starting at Index.
@@ -100,15 +130,50 @@ function CopyTPA(const TPA: TPointArray): TPointArray;
 ///	<returns>
 ///	  A new TPointArray with copies of all original values in the subset of TPA.
 ///	</returns>
+///	<seealso cref="CopyTPA" />
+{$ENDREGION}
 function CopyTPAEx(const TPA: TPointArray; const Index, Count: Integer): TPointArray;
 
+{$REGION 'Documentation'}
 ///	<summary>
-///	  Reverses the order of the elements of a given TPointArray.
+///	  Reverses the order of the elements of a given <see cref="OpenAPI.Globals|TPointArray" />.
 ///	</summary>
 ///	<param name="TPA">
-///	  The TPointArray which will be reversed in order.
+///	  The <see cref="OpenAPI.Globals|TPointArray" /> which will be reversed in order.
 ///	</param>
+{$ENDREGION}
 procedure ReverseTPA(var TPA: TPointArray);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Converts a given <see cref="OpenAPI.Globals|TPointArray" /> to a string.
+///	</summary>
+///	<param name="TPA">
+///	  The <see cref="OpenAPI.Globals|TPointArray" /> which will be converted to a string.
+///	</param>
+///	<returns>
+///	  The string formatted as (X1,Y1);(X2,Y2);...;(Xn,Yn).
+///	</returns>
+{$ENDREGION}
+function TPAToStr(const TPA: TPointArray): string;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Calculates the standard deviation of the sum of all x-coordinates and y-coordinates of the
+///	  given <see cref="OpenAPI.Globals|TPointArray" />.
+///	</summary>
+///	<param name="TPA">
+///	  The <see cref="OpenAPI.Globals|TPointArray" /> which will be used to calculate the standard
+///	  deviations.
+///	</param>
+///	<param name="XSpread">
+///	  The standard deviation for the x-coordinates.
+///	</param>
+///	<param name="YSpread">
+///	  The standard deviation for the y-coordinates.
+///	</param>
+{$ENDREGION}
+procedure TPASpread(const TPA: TPointArray; out XSpread, YSpread: Extended);
 
 implementation
 
@@ -209,6 +274,54 @@ begin
   end;
 end;
 
+function TPAToStr(const TPA: TPointArray): string;
+var
+  PtPtr: PPoint;
+  Idx, Hi: Integer;
+begin
+  Hi := High(TPA);
+  if Hi >= 0 then Exit('');
+  PtPtr := @TPA[0];
+  Result := '';
+  for Idx := 0 to Hi do
+  begin
+    Result := Result + '(' + IntToStr(PtPtr^.X) + ',' + IntToStr(PtPtr^.Y) + ')';
+    if Idx <> Hi then
+      Result := Result + ';';
+    Inc(PtPtr);
+  end;
+end;
+
+procedure TPASpread(const TPA: TPointArray; out XSpread, YSpread: Extended);
+var
+  XValues, YValues: array of Extended;
+  Len: Integer;
+  PtPtr, PtPtrMax: PPoint;
+  XPtr, YPtr: PExtended;
+begin
+  Len := Length(TPA);
+  SetLength(XValues, Len);
+  SetLength(YValues, Len);
+  // Set up pointers
+  PtPtr := @TPA[0];
+  PtPtrMax := PtPtr;
+  Inc(PtPtrMax, Len);
+  XPtr := @XValues[0];
+  YPtr := @YValues[0];
+  // Split coordinates
+  while PtPtr <> PtPtrMax do
+  begin
+    XPtr^ := PtPtr^.X;
+    YPtr^ := PtPtr^.Y;
+    Inc(PtPtr);
+    Inc(XPtr);
+    Inc(YPtr);
+  end;
+  // Calculate standard deviation of coordinates
+  XSpread := StdDev(XValues);
+  YSpread := StdDev(YValues);
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -222,6 +335,8 @@ initialization
     Engine.AddFunction(@CopyTPA, 'function CopyTPA(const TPA: TPointArray): TPointArray;'); //
     Engine.AddFunction(@CopyTPAEx, 'function CopyTPAEx(const TPA: TPointArray; const Index, Count: Integer): TPointArray;'); //
     Engine.AddFunction(@ReverseTPA, 'procedure ReverseTPA(var TPA: TPointArray);'); //
+    Engine.AddFunction(@TPAToStr, 'function TPAToStr(const TPA: TPointArray): string;'); //
+    Engine.AddFunction(@TPASpread, 'procedure TPASpread(const TPA: TPointArray; out XSpread, YSpread: Extended);');
   end);
 {$ENDIF}
 end.

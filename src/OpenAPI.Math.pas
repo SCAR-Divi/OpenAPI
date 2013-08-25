@@ -3,10 +3,11 @@ unit OpenAPI.Math;
 interface
 
 uses
-  System.Math,
+  System.Math
 
-  {$IFDEF EXPORTS}uPSComponent, uEngine_PascalScript{$ENDIF};
+  {$IFDEF EXPORTS}, uPSComponent, uEngine_PascalScript{$ENDIF};
 
+{$REGION 'Documentation'}
 ///	<summary>
 ///	  Calculates the Euclidean distance between two points.
 ///	</summary>
@@ -25,8 +26,10 @@ uses
 ///	<returns>
 ///	  The distance between the two points.
 ///	</returns>
+{$ENDREGION}
 function Distance(const X1, Y1, X2, Y2: Integer): Extended;
 
+{$REGION 'Documentation'}
 ///	<summary>
 ///	  Returns True if a given point falls within or on a given circle.
 ///	</summary>
@@ -48,6 +51,7 @@ function Distance(const X1, Y1, X2, Y2: Integer): Extended;
 ///	<returns>
 ///	  True if (X, Y) falls in or on the circle at (CenterX, CenterY) with a given Radius.
 ///	</returns>
+{$ENDREGION}
 function InCircle(const X, Y, CenterX, CenterY, Radius: Integer): Boolean; inline;
 
 implementation
