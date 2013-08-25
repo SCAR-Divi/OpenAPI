@@ -102,6 +102,14 @@ function CopyTPA(const TPA: TPointArray): TPointArray;
 ///	</returns>
 function CopyTPAEx(const TPA: TPointArray; const Index, Count: Integer): TPointArray;
 
+///	<summary>
+///	  Reverses the order of the elements of a given TPointArray.
+///	</summary>
+///	<param name="TPA">
+///	  The TPointArray which will be reversed in order.
+///	</param>
+procedure ReverseTPA(var TPA: TPointArray);
+
 implementation
 
 procedure SortTPA(var TPA: TPointArray);
@@ -180,6 +188,27 @@ begin
   Result := Copy(TPA, Max(0, Index), Min(Length(TPA), Count));
 end;
 
+procedure ReverseTPA(var TPA: TPointArray);
+var
+  Pt: TPoint;
+  PtPtrLeft, PtPtrRight: PPoint;
+  Idx, Hi, Mid: Integer;
+begin
+  Hi := High(TPA);
+  if Hi < 1 then Exit;
+  Mid := Hi div 2;
+  PtPtrLeft := @TPA[0];
+  PtPtrRight := @TPA[Hi];
+  for Idx := 0 to Mid do
+  begin
+    Pt := PtPtrLeft^;
+    PtPtrLeft^ := PtPtrRight^;
+    PtPtrRight^ := Pt;
+    Inc(PtPtrLeft);
+    Dec(PtPtrRight);
+  end;
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -192,6 +221,7 @@ initialization
     Engine.AddFunction(@OffsetTPA, 'procedure OffsetTPA(var TPA: TPointArray; const XOffset, YOffset: Integer);'); //
     Engine.AddFunction(@CopyTPA, 'function CopyTPA(const TPA: TPointArray): TPointArray;'); //
     Engine.AddFunction(@CopyTPAEx, 'function CopyTPAEx(const TPA: TPointArray; const Index, Count: Integer): TPointArray;'); //
+    Engine.AddFunction(@ReverseTPA, 'procedure ReverseTPA(var TPA: TPointArray);'); //
   end);
 {$ENDIF}
 end.
