@@ -218,8 +218,8 @@ procedure SortTPAByY(var TPA: TPointArray);
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Splits up an array of two-dimensional points by clustering all points within a certain
-///	  (Euclidean) distance from each other together.
+///	  Splits up <paramref name="TPA" /> by clustering all points within a certain (Euclidean)
+///	  distance from each other together.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The array of points that will be processed.
@@ -240,8 +240,8 @@ function SplitTPA(const TPA: TPointArray; const Dist: Integer): T2DPointArray;
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Splits up an array of two-dimensional points by clustering all points within a certain
-///	  distance from each other together.
+///	  Splits up <paramref name="TPA" /> by clustering all points within a certain distance from
+///	  each other together.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The array of points that will be processed.
@@ -265,6 +265,70 @@ function SplitTPA(const TPA: TPointArray; const Dist: Integer): T2DPointArray;
 ///	<seealso cref="SplitTPA" />
 {$ENDREGION}
 function SplitTPAEx(const TPA: TPointArray; const XMax, YMax: Integer): T2DPointArray;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Fills every cell in <paramref name="TPA" /> with <paramref name="Value" />.
+///	</summary>
+///	<param name="TPA">
+///	  The array that will be filled.
+///	</param>
+///	<param name="Value">
+///	  The value the array will be filled with.
+///	</param>
+{$ENDREGION}
+procedure FillTPA(var TPA: TPointArray; const Value: TPoint);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Fills the cells in <paramref name="TPA" /> with the values in <paramref name="Values" />.
+///	</summary>
+///	<param name="TPA">
+///	  The array that will be filled.
+///	</param>
+///	<param name="Values">
+///	  The array of values that will be used to fill <paramref name="TPA" />.
+///	</param>
+///	<remarks>
+///	  The function cycles through the points in <paramref name="Values" /> if it's size is smaller than <paramref name="TPA" />'s.
+///	</remarks>
+{$ENDREGION}
+procedure FillTPAEx(var TPA: TPointArray; const Values: TPointArray);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Removes the last item from <paramref name="TPA" /> and returns it.
+///	</summary>
+///	<param name="TPA">
+///	  The array that will be processed.
+///	</param>
+///	<returns>
+///	  The last value found in <paramref name="TPA" />.
+///	</returns>
+///	<exception cref="ETPAException">
+///	  If <paramref name="TPA" /> is empty.
+///	</exception>
+{$ENDREGION}
+function TPAPop(var TPA: TPointArray): TPoint;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Removes the first or last item from <paramref name="TPA" /> and returns it.
+///	</summary>
+///	<param name="TPA">
+///	  The array that will be processed.
+///	</param>
+///	<param name="Front">
+///	  If True, the first item at index zero will be removed, else the last item.
+///	</param>
+///	<returns>
+///	  The last value found in <paramref name="TPA" />.
+///	</returns>
+///	<exception cref="ETPAException">
+///	  If <paramref name="TPA" /> is empty.
+///	</exception>
+{$ENDREGION}
+function TPAPopEx(var TPA: TPointArray; const Front: Boolean): TPoint;
 
 implementation
 
@@ -441,8 +505,6 @@ procedure SortTPAByX(var TPA: TPointArray);
 var
   Lo, Hi, Idx, GapIdx, Gap, Idx2: Integer;
   Pt: TPoint;
-const
-  SHELLGAPS: array[0..15] of Integer = (345152, 153401, 68178, 30301, 13467, 5985, 2660, 1182, 525, 233, 103, 46, 20, 9, 4, 1);
 begin
   Lo := Low(TPA); Hi := High(TPA);
   if Hi - Lo + 1 <= 1 then Exit;
@@ -467,8 +529,6 @@ procedure SortTPAByY(var TPA: TPointArray);
 var
   Lo, Hi, Idx, GapIdx, Gap, Idx2: Integer;
   Pt: TPoint;
-const
-  SHELLGAPS: array[0..15] of Integer = (345152, 153401, 68178, 30301, 13467, 5985, 2660, 1182, 525, 233, 103, 46, 20, 9, 4, 1);
 begin
   Lo := Low(TPA); Hi := High(TPA);
   if Hi - Lo + 1 <= 1 then Exit;
@@ -494,6 +554,7 @@ var
   Len, DistSqr, ResPos, ResAPos, Idx, IdxCheck, XDiff, YDiff: Integer;
   Points: TPointArray;
   Checked: TBoolArray;
+  // TODO: Investigate Stack vs Queue performance (as stack checks points in reverse order)
   Active: TSimpleStack<TPoint>;
   Pt, PtCheck: TPoint;
 begin
@@ -626,6 +687,67 @@ begin
   SetLength(Result, ResPos);
 end;
 
+procedure FillTPA(var TPA: TPointArray; const Value: TPoint);
+var
+  Len: Integer;
+  Cur, Max: PPoint;
+begin
+  Len := Length(TPA);
+  if Len = 0 then Exit;
+  Cur := @TPA[0];
+  Max := @TPA[0];
+  Inc(Max, Len);
+  repeat
+    Cur^ := Value;
+    Inc(Cur);
+  until Cur = Max;
+end;
+
+procedure FillTPAEx(var TPA: TPointArray; const Values: TPointArray);
+var
+  Idx, Len, VLen: Integer;
+  Cur: PPoint;
+begin
+  Len := Length(TPA);
+  if Len = 0 then Exit;
+  VLen := Length(Values);
+  if VLen = 0 then
+    raise ETPAException.Create('No values given!');
+  Cur := @TPA[0];
+  for Idx := 0 to Len - 1 do
+  begin
+    Cur^ := Values[Idx mod VLen];
+    Inc(Cur);
+  end;
+end;
+
+function TPAPop(var TPA: TPointArray): TPoint;
+var
+  Idx, Len: Integer;
+begin
+  Len := Length(TPA);
+  if Len = 0 then
+    raise ETPAException.Create('Array is empty!');
+  Result := TPA[Len - 1];
+  SetLength(TPA, Len - 1);
+end;
+
+function TPAPopEx(var TPA: TPointArray; const Front: Boolean): TPoint;
+var
+  Idx, Len: Integer;
+begin
+  if not Front then
+    Result := TPAPop(TPA)
+  else begin
+    Len := Length(TPA);
+    if Len = 0 then
+      raise ETPAException.Create('Array is empty!');
+    Result := TPA[0];
+    Move(TPA[1], TPA[0], (Len - 1) * SizeOf(TPoint));
+    SetLength(TPA, Len - 1);
+  end;
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -646,6 +768,10 @@ initialization
     Engine.AddFunction(@SortTPAByY, 'procedure SortTPAByY(var TPA: TPointArray);');
     Engine.AddFunction(@SplitTPA, 'function SplitTPA(const TPA: TPointArray; const Dist: Integer): T2DPointArray;'); //
     Engine.AddFunction(@SplitTPAEx, 'function SplitTPAEx(const TPA: TPointArray; const XMax, YMax: Integer): T2DPointArray;'); //
+    Engine.AddFunction(@FillTPA, 'procedure FillTPA(var TPA: TPointArray; const Value: TPoint);');
+    Engine.AddFunction(@FillTPAEx, 'procedure FillTPAEx(var TPA: TPointArray; const Values: TPointArray);');
+    Engine.AddFunction(@TPAPop, 'function TPAPop(var TPA: TPointArray): TPoint;');
+    Engine.AddFunction(@TPAPopEx, 'function TPAPopEx(var TPA: TPointArray; const Front: Boolean): TPoint;');
   end);
 {$ENDIF}
 end.
