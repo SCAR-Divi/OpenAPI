@@ -3,7 +3,7 @@ unit OpenAPI.TPA;
 interface
 
 uses
-  System.Types,
+  System.Types, System.Math,
 
   {$IFDEF EXPORTS}uPSComponent, uEngine_PascalScript,{$ENDIF}
 
@@ -56,6 +56,52 @@ function CombineTPA(const TPA1, TPA2: TPointArray): TPointArray;
 ///	</returns>
 function TPAEmpty(const TPA: TPointArray): Boolean;
 
+///	<summary>
+///	  Offsets the coordindates of a given TPointArray.
+///	</summary>
+///	<param name="TPA">
+///	  The TPointArray to be offset.
+///	</param>
+///	<param name="XOffset">
+///	  The x-coordinate offset value.
+///	</param>
+///	<param name="YOffset">
+///	  The y-coordinate offset value.
+///	</param>
+procedure OffsetTPA(var TPA: TPointArray; const XOffset, YOffset: Integer); inline;
+
+///	<summary>
+///	  Returns a copy of a given TPointArray.
+///	</summary>
+///	<param name="TPA">
+///	  The TPointArray to copy.
+///	</param>
+///	<returns>
+///	  A new TPointArray with copies of all original values in TPA.
+///	</returns>
+///	<remarks>
+///	  This function is used to create copies of TPointArrays as arrays are passed by reference and
+///	  cannot be duplicated by assignment.
+///	</remarks>
+function CopyTPA(const TPA: TPointArray): TPointArray;
+
+///	<summary>
+///	  Returns a subset of a given TPointArray.
+///	</summary>
+///	<param name="TPA">
+///	  The TPointArray to copy.
+///	</param>
+///	<param name="Index">
+///	  The index from which to start copying the TPointArray.
+///	</param>
+///	<param name="Count">
+///	  The number of items to copy starting at Index.
+///	</param>
+///	<returns>
+///	  A new TPointArray with copies of all original values in the subset of TPA.
+///	</returns>
+function CopyTPAEx(const TPA: TPointArray; const Index, Count: Integer): TPointArray;
+
 implementation
 
 procedure SortTPA(var TPA: TPointArray);
@@ -65,7 +111,7 @@ end;
 
 procedure SortTPAEx(var TPA: TPointArray; const Point: TPoint);
 var
-  Lo, Hi, Idx, GapIdx, Gap, Idx2: Integer;
+  Lo, Hi, Idx, Idx2, GapIdx, Gap: Integer;
   PtDist, TmpX, TmpY: Extended; // Extended datatype to accommodate large coordinates
   Pt: TPoint;
   Dists: TExtArray;
@@ -110,6 +156,30 @@ begin
   Result := Length(TPA) = 0;
 end;
 
+procedure OffsetTPA(var TPA: TPointArray; const XOffset, YOffset: Integer); inline;
+var
+  PtPtr, PtPtrMax: PPoint;
+begin
+  PtPtr := @TPA[0];
+  PtPtrMax := PtPtr; Inc(PtPtrMax, Length(TPA));
+  while PtPtr <> PtPtrMax do
+  begin
+    Inc(PtPtr^.X, XOffset);
+    Inc(PtPtr^.Y, YOffset);
+    Inc(PtPtr);
+  end;
+end;
+
+function CopyTPA(const TPA: TPointArray): TPointArray;
+begin
+  Result := Copy(TPA, 0, Length(TPA));
+end;
+
+function CopyTPAEx(const TPA: TPointArray; const Index, Count: Integer): TPointArray;
+begin
+  Result := Copy(TPA, Max(0, Index), Min(Length(TPA), Count));
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -119,6 +189,9 @@ initialization
     Engine.AddFunction(@SortTPAEx, 'procedure SortTPAEx(var TPA: TPointArray; const Point: TPoint);'); //
     Engine.AddFunction(@CombineTPA, 'function CombineTPA(const TPA1, TPA2: TPointArray): TPointArray;'); //
     Engine.AddFunction(@TPAEmpty, 'function TPAEmpty(const TPA: TPointArray): Boolean;'); //
+    Engine.AddFunction(@OffsetTPA, 'procedure OffsetTPA(var TPA: TPointArray; const XOffset, YOffset: Integer);'); //
+    Engine.AddFunction(@CopyTPA, 'function CopyTPA(const TPA: TPointArray): TPointArray;'); //
+    Engine.AddFunction(@CopyTPAEx, 'function CopyTPAEx(const TPA: TPointArray; const Index, Count: Integer): TPointArray;'); //
   end);
 {$ENDIF}
 end.
