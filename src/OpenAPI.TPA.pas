@@ -29,7 +29,7 @@ type
 ///	  <see href="http://en.wikipedia.org/wiki/Shellsort">ShellSort</see> sorting algorithm.
 ///	</summary>
 ///	<param name="TPA">
-///	  The unsorted <see cref="OpenAPI.Globals|TPointArray" />, which will be sorted.
+///	  The unsorted array.
 ///	</param>
 ///	<remarks>
 ///	  SortTPA calls SortTPAEx internally by referencing the point at 0, 0 as offset.
@@ -46,7 +46,7 @@ procedure SortTPA(var TPA: TPointArray);
 ///	  <see href="http://en.wikipedia.org/wiki/Shellsort">ShellSort</see> sorting algorithm.
 ///	</summary>
 ///	<param name="TPA">
-///	  The unsorted <see cref="OpenAPI.Globals|TPointArray" />, which will be sorted.
+///	  The unsorted array.
 ///	</param>
 ///	<param name="Point">
 ///	  The refence point used to calculate distances.
@@ -57,40 +57,44 @@ procedure SortTPAEx(var TPA: TPointArray; const Point: TPoint);
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Combines two <see cref="OpenAPI.Globals|TPointArray">TPointArrays</see> by appending one to the
-///	  other and returning the resulting new <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
+///	  Combines two <see cref="OpenAPI.Globals|TPointArray">TPointArrays</see> by appending one to
+///	  the other and returning the resulting array.
 ///	</summary>
 ///	<param name="TPA1">
 ///	  The first TPointArray.
 ///	</param>
 ///	<param name="TPA2">
-///	  The TPointArray which will be appended to TPA1.
+///	  The array which will be appended to <paramref name="TPA1" />.
 ///	</param>
 ///	<returns>
 ///	  A TPointArray containing TPA1 with TPA2 appended to the end.
 ///	</returns>
+///	<remarks>
+///	  The resulting array is a copy, it does not reference <paramref name="TPA1" /> or
+///	  <paramref name="TPA2" />, as a result, these arrays remain unchanged.
+///	</remarks>
 {$ENDREGION}
 function CombineTPA(const TPA1, TPA2: TPointArray): TPointArray;
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Returns True if the given TPA has zero elements.
+///	  Returns True if <paramref name="TPA" /> has zero elements.
 ///	</summary>
 ///	<param name="TPA">
-///	  The TPA which will be verified.
+///	  The array which will be verified.
 ///	</param>
 ///	<returns>
-///	  True if TPA has zero elements, False in any other case.
+///	  True if <paramref name="TPA" /> has zero elements, False in any other case.
 ///	</returns>
 {$ENDREGION}
 function TPAEmpty(const TPA: TPointArray): Boolean;
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Offsets the coordindates of a given <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
+///	  Offsets the coordindates of a given <paramref name="TPA" />.
 ///	</summary>
 ///	<param name="TPA">
-///	  The <see cref="OpenAPI.Globals|TPointArray">TPointArray</see> to be offset.
+///	  The array to be offset.
 ///	</param>
 ///	<param name="XOffset">
 ///	  The x-coordinate offset value.
@@ -103,13 +107,13 @@ procedure OffsetTPA(var TPA: TPointArray; const XOffset, YOffset: Integer); inli
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Returns a copy of a given <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
+///	  Returns a copy of <paramref name="TPA" />.
 ///	</summary>
 ///	<param name="TPA">
-///	  The <see cref="OpenAPI.Globals|TPointArray">TPointArray</see> to copy.
+///	  The array to copy.
 ///	</param>
 ///	<returns>
-///	  A new <see cref="OpenAPI.Globals|TPointArray">TPointArray</see> with copies of all original values in TPA.
+///	  A new array with copies of all original values in TPA.
 ///	</returns>
 ///	<remarks>
 ///	  This function is used to create copies of
@@ -122,19 +126,19 @@ function CopyTPA(const TPA: TPointArray): TPointArray;
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Returns a subset of a given <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
+///	  Returns a subset of <paramref name="TPA" />.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The TPointArray to copy.
 ///	</param>
 ///	<param name="Index">
-///	  The index from which to start copying the <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
+///	  The index from which to start copying the array.
 ///	</param>
 ///	<param name="Count">
 ///	  The number of items to copy starting at Index.
 ///	</param>
 ///	<returns>
-///	  A new TPointArray with copies of all original values in the subset of TPA.
+///	  A new array with copies of all original values in the subset of TPA.
 ///	</returns>
 ///	<seealso cref="CopyTPA" />
 {$ENDREGION}
@@ -142,7 +146,7 @@ function CopyTPAEx(const TPA: TPointArray; const Index, Count: Integer): TPointA
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Reverses the order of an array of two-dimensional points.
+///	  Reverses the order of <paramref name="TPA" />.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The array which will be reversed in order.
@@ -166,7 +170,7 @@ function TPAToStr(const TPA: TPointArray): string;
 {$REGION 'Documentation'}
 ///	<summary>
 ///	  Calculates the standard deviation of the sum of all x-coordinates and y-coordinates of the
-///	  given array of two-dimensional points.
+///	  <paramref name="TPA" />.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The array of points which will be used to calculate the standard deviations.
@@ -182,7 +186,8 @@ procedure TPASpread(const TPA: TPointArray; out XSpread, YSpread: Extended);
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Checks if two arrays of two-dimensional points have the same lengths, elements and order.
+///	  Checks <paramref name="TPA1" /> and <paramref name="TPA2" /> have the same lengths, elements
+///	  and order.
 ///	</summary>
 ///	<param name="TPA1">
 ///	  The first array.
@@ -198,7 +203,7 @@ function TPAEquals(const TPA1, TPA2: TPointArray): Boolean; inline;
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Sorts a given array of two-dimensional points by ascending x-coordinates.
+///	  Sorts <paramref name="TPA" /> by ascending x-coordinates.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The array of points that will be sorted.
@@ -208,7 +213,7 @@ procedure SortTPAByX(var TPA: TPointArray);
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Sorts a given array of two-dimensional points by ascending y-coordinates.
+///	  Sorts a <paramref name="TPA" /> by ascending y-coordinates.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The array of points that will be sorted.
@@ -252,9 +257,6 @@ function SplitTPA(const TPA: TPointArray; const Dist: Integer): T2DPointArray;
 ///	<param name="YMax">
 ///	  The maximum distance on the y-axis.
 ///	</param>
-///	<param name="Dist">
-///	  The maximum distance two points in the same cluster can be separated.
-///	</param>
 ///	<returns>
 ///	  A two-dimensional array which holds all of the clustered points.
 ///	</returns>
@@ -290,7 +292,8 @@ procedure FillTPA(var TPA: TPointArray; const Value: TPoint);
 ///	  The array of values that will be used to fill <paramref name="TPA" />.
 ///	</param>
 ///	<remarks>
-///	  The function cycles through the points in <paramref name="Values" /> if it's size is smaller than <paramref name="TPA" />'s.
+///	  The function cycles through the points in <paramref name="Values" /> if it's size is smaller
+///	  than <paramref name="TPA" />'s.
 ///	</remarks>
 {$ENDREGION}
 procedure FillTPAEx(var TPA: TPointArray; const Values: TPointArray);
