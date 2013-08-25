@@ -20,3 +20,8 @@ Requirements
 The library is develop using Embarcadero Delphi XE2. This is it's main and only supported target. It's
 possible that it will also compile in older or newer versions of Embarcero Delphi, but this is not
 quaranteed.
+
+Documentation
+-------------
+
+Documentation for the API is available at [openapi.scar-divi.com](http://openapi.scar-divi.com/).
