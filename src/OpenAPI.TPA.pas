@@ -333,6 +333,35 @@ function TPAPop(var TPA: TPointArray): TPoint;
 {$ENDREGION}
 function TPAPopEx(var TPA: TPointArray; const Front: Boolean): TPoint;
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Returns the boundaries of <paramref name="TPA" /> as a <see cref="OpenAPI.Globals|TBox">TBox</see>.
+///	</summary>
+///	<param name="TPA">
+///	  The array which will be processed.
+///	</param>
+///	<returns>
+///	  The smallest box that will encapsulate all points in <paramref name="TPA" />.
+///	</returns>
+{$ENDREGION}
+function TPABounds(const TPA: TPointArray): TBox;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Checks if <paramref name="Point" /> is part of <paramref name="TPA" />.
+///	</summary>
+///	<param name="TPA">
+///	  The reference array.
+///	</param>
+///	<param name="Point">
+///	  The point to search for.
+///	</param>
+///	<returns>
+///	  True if <paramref name="Point" /> was found in <paramref name="TPA" />.
+///	</returns>
+{$ENDREGION}
+function TPAContains(const TPA: TPointArray; const Point: TPoint): Boolean; inline;
+
 implementation
 
 procedure SortTPA(var TPA: TPointArray);
@@ -751,6 +780,47 @@ begin
   end;
 end;
 
+function TPABounds(const TPA: TPointArray): TBox;
+var
+  Len: Integer;
+  PtPtr, PtPtrMax: PPoint;
+begin
+  Len := Length(TPA);
+  if Len = 0 then Exit;
+  with Result do
+  begin
+    PtPtr := @TPA[0];
+    x1 := PtPtr^.X;
+    y1 := PtPtr^.Y;
+    x2 := PtPtr^.X;
+    y2 := PtPtr^.Y;
+    if Len = 1 then Exit;
+    PtPtrMax := @TPA[0];
+    Inc(PtPtrMax, Len);
+    repeat
+      if x1 > PtPtr^.X then x1 := PtPtr^.X else
+        if x2 < PtPtr^.X then x2 := PtPtr^.X;
+      if y1 > PtPtr^.Y then y1 := PtPtr^.Y else
+        if y2 < PtPtr^.Y then y2 := PtPtr^.Y;
+      Inc(PtPtr);
+    until PtPtr = PtPtrMax;
+  end;
+end;
+
+function TPAContains(const TPA: TPointArray; const Point: TPoint): Boolean; inline;
+var
+  PtPtr, PtPtrMax: PPoint;
+begin
+  Result := False;
+  PtPtr := @TPA[0];
+  PtPtrMax := PtPtr; Inc(PtPtrMax, Length(TPA));
+  while PtPtr <> PtPtrMax do
+  begin
+    if (PtPtr^.X = Point.X) and (PtPtr^.Y = Point.Y) then Exit(True);
+    Inc(PtPtr);
+  end;
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -775,6 +845,8 @@ initialization
     Engine.AddFunction(@FillTPAEx, 'procedure FillTPAEx(var TPA: TPointArray; const Values: TPointArray);');
     Engine.AddFunction(@TPAPop, 'function TPAPop(var TPA: TPointArray): TPoint;');
     Engine.AddFunction(@TPAPopEx, 'function TPAPopEx(var TPA: TPointArray; const Front: Boolean): TPoint;');
+    Engine.AddFunction(@TPABounds, 'function TPABounds(const TPA: TPointArray): TBox;'); //
+    Engine.AddFunction(@TPAContains, 'function TPAContains(const TPA: TPointArray; const Point: TPoint): Boolean;'); //
   end);
 {$ENDIF}
 end.
