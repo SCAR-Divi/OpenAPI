@@ -25,3 +25,5 @@ Documentation
 -------------
 
 Documentation for the API is available at [openapi.scar-divi.com](http://openapi.scar-divi.com/).
+An offline chm copy of the documentation can be [downloaded](http://openapi.scar-divi.com/OpenAPI.chm) as
+well.
