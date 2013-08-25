@@ -1,3 +1,8 @@
+{$REGION 'Documentation'}
+///	<summary>
+///	  This namespace contains all mathematical functions.
+///	</summary>
+{$ENDREGION}
 unit OpenAPI.Math;
 
 interface

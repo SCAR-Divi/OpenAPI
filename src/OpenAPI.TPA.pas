@@ -1,3 +1,9 @@
+{$REGION 'Documentation'}
+///	<summary>
+///	  This namespace contains all functions relating to
+///	  <see cref="OpenAPI.Globals|TPointArray">TPointArrays</see>.
+///	</summary>
+{$ENDREGION}
 unit OpenAPI.TPA;
 
 interface
@@ -20,7 +26,7 @@ type
 {$REGION 'Documentation'}
 ///	<summary>
 ///	  Sorts a given set of points by their Euclidean distance from the origin at 0, 0 by using the
-///	  ShellSort sorting algorithm.
+///	  <see href="http://en.wikipedia.org/wiki/Shellsort">ShellSort</see> sorting algorithm.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The unsorted <see cref="OpenAPI.Globals|TPointArray" />, which will be sorted.
@@ -36,8 +42,8 @@ procedure SortTPA(var TPA: TPointArray);
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Sorts a given set of points by their Euclidean distance from a given point by using the
-///	  ShellSort sorting algorithm.
+///	  Sorts a given set of points by their Euclidean distance from a given point by using the
+///	  <see href="http://en.wikipedia.org/wiki/Shellsort">ShellSort</see> sorting algorithm.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The unsorted <see cref="OpenAPI.Globals|TPointArray" />, which will be sorted.
@@ -51,8 +57,8 @@ procedure SortTPAEx(var TPA: TPointArray; const Point: TPoint);
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Combines 2 <see cref="OpenAPI.Globals|TPointArray">TPointArrays</see> by appending one to the
-///	  other and returning the resulting new <see cref="OpenAPI.Globals|TPointArray" />.
+///	  Combines two <see cref="OpenAPI.Globals|TPointArray">TPointArrays</see> by appending one to the
+///	  other and returning the resulting new <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
 ///	</summary>
 ///	<param name="TPA1">
 ///	  The first TPointArray.
@@ -81,10 +87,10 @@ function TPAEmpty(const TPA: TPointArray): Boolean;
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Offsets the coordindates of a given <see cref="OpenAPI.Globals|TPointArray" />.
+///	  Offsets the coordindates of a given <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
 ///	</summary>
 ///	<param name="TPA">
-///	  The <see cref="OpenAPI.Globals|TPointArray" /> to be offset.
+///	  The <see cref="OpenAPI.Globals|TPointArray">TPointArray</see> to be offset.
 ///	</param>
 ///	<param name="XOffset">
 ///	  The x-coordinate offset value.
@@ -97,13 +103,13 @@ procedure OffsetTPA(var TPA: TPointArray; const XOffset, YOffset: Integer); inli
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Returns a copy of a given <see cref="OpenAPI.Globals|TPointArray" />.
+///	  Returns a copy of a given <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
 ///	</summary>
 ///	<param name="TPA">
-///	  The <see cref="OpenAPI.Globals|TPointArray" /> to copy.
+///	  The <see cref="OpenAPI.Globals|TPointArray">TPointArray</see> to copy.
 ///	</param>
 ///	<returns>
-///	  A new <see cref="OpenAPI.Globals|TPointArray" /> with copies of all original values in TPA.
+///	  A new <see cref="OpenAPI.Globals|TPointArray">TPointArray</see> with copies of all original values in TPA.
 ///	</returns>
 ///	<remarks>
 ///	  This function is used to create copies of
@@ -116,13 +122,13 @@ function CopyTPA(const TPA: TPointArray): TPointArray;
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Returns a subset of a given <see cref="OpenAPI.Globals|TPointArray" />.
+///	  Returns a subset of a given <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The TPointArray to copy.
 ///	</param>
 ///	<param name="Index">
-///	  The index from which to start copying the <see cref="OpenAPI.Globals|TPointArray" />.
+///	  The index from which to start copying the <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
 ///	</param>
 ///	<param name="Count">
 ///	  The number of items to copy starting at Index.
@@ -136,20 +142,20 @@ function CopyTPAEx(const TPA: TPointArray; const Index, Count: Integer): TPointA
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Reverses the order of the elements of a given <see cref="OpenAPI.Globals|TPointArray" />.
+///	  Reverses the order of an array of two-dimensional points.
 ///	</summary>
 ///	<param name="TPA">
-///	  The <see cref="OpenAPI.Globals|TPointArray" /> which will be reversed in order.
+///	  The array which will be reversed in order.
 ///	</param>
 {$ENDREGION}
 procedure ReverseTPA(var TPA: TPointArray);
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Converts a given <see cref="OpenAPI.Globals|TPointArray" /> to a string.
+///	  Converts an array of two-dimensional points to a string.
 ///	</summary>
 ///	<param name="TPA">
-///	  The <see cref="OpenAPI.Globals|TPointArray" /> which will be converted to a string.
+///	  The array which will be converted to a string.
 ///	</param>
 ///	<returns>
 ///	  The string formatted as (X1,Y1);(X2,Y2);...;(Xn,Yn).
@@ -160,11 +166,10 @@ function TPAToStr(const TPA: TPointArray): string;
 {$REGION 'Documentation'}
 ///	<summary>
 ///	  Calculates the standard deviation of the sum of all x-coordinates and y-coordinates of the
-///	  given <see cref="OpenAPI.Globals|TPointArray" />.
+///	  given array of two-dimensional points.
 ///	</summary>
 ///	<param name="TPA">
-///	  The <see cref="OpenAPI.Globals|TPointArray" /> which will be used to calculate the standard
-///	  deviations.
+///	  The array of points which will be used to calculate the standard deviations.
 ///	</param>
 ///	<param name="XSpread">
 ///	  The standard deviation for the x-coordinates.
@@ -174,6 +179,92 @@ function TPAToStr(const TPA: TPointArray): string;
 ///	</param>
 {$ENDREGION}
 procedure TPASpread(const TPA: TPointArray; out XSpread, YSpread: Extended);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Checks if two arrays of two-dimensional points have the same lengths, elements and order.
+///	</summary>
+///	<param name="TPA1">
+///	  The first array.
+///	</param>
+///	<param name="TPA2">
+///	  The second array.
+///	</param>
+///	<returns>
+///	  True if the arrays are identical.
+///	</returns>
+{$ENDREGION}
+function TPAEquals(const TPA1, TPA2: TPointArray): Boolean; inline;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Sorts a given array of two-dimensional points by ascending x-coordinates.
+///	</summary>
+///	<param name="TPA">
+///	  The array of points that will be sorted.
+///	</param>
+{$ENDREGION}
+procedure SortTPAByX(var TPA: TPointArray);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Sorts a given array of two-dimensional points by ascending y-coordinates.
+///	</summary>
+///	<param name="TPA">
+///	  The array of points that will be sorted.
+///	</param>
+{$ENDREGION}
+procedure SortTPAByY(var TPA: TPointArray);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Splits up an array of two-dimensional points by clustering all points within a certain
+///	  (Euclidean) distance from each other together.
+///	</summary>
+///	<param name="TPA">
+///	  The array of points that will be processed.
+///	</param>
+///	<param name="Dist">
+///	  The maximum distance two points in the same cluster can be separated.
+///	</param>
+///	<returns>
+///	  A two-dimensional array which holds all of the clustered points.
+///	</returns>
+///	<remarks>
+///	  This is an O(N²) algorithm, it's not advised to use it on large datasets. It should handle up
+///	  to at least 10000 points fairly well.
+///	</remarks>
+///	<seealso cref="SplitTPAEx" />
+{$ENDREGION}
+function SplitTPA(const TPA: TPointArray; const Dist: Integer): T2DPointArray;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Splits up an array of two-dimensional points by clustering all points within a certain
+///	  distance from each other together.
+///	</summary>
+///	<param name="TPA">
+///	  The array of points that will be processed.
+///	</param>
+///	<param name="XMax">
+///	  The maximum distance on the x-axis.
+///	</param>
+///	<param name="YMax">
+///	  The maximum distance on the y-axis.
+///	</param>
+///	<param name="Dist">
+///	  The maximum distance two points in the same cluster can be separated.
+///	</param>
+///	<returns>
+///	  A two-dimensional array which holds all of the clustered points.
+///	</returns>
+///	<remarks>
+///	  This is an O(N²) algorithm, it's not advised to use it on large datasets. It should handle up
+///	  to at least 10000 points fairly well.
+///	</remarks>
+///	<seealso cref="SplitTPA" />
+{$ENDREGION}
+function SplitTPAEx(const TPA: TPointArray; const XMax, YMax: Integer): T2DPointArray;
 
 implementation
 
@@ -322,6 +413,219 @@ begin
   YSpread := StdDev(YValues);
 end;
 
+function TPAEquals(const TPA1, TPA2: TPointArray): Boolean; inline;
+var
+  Idx, Len1, Len2: Integer;
+  PtPtrP1, PtPtrP2: PPoint;
+begin
+  Result := False;
+  Len1 := Length(TPA1);
+  Len2 := Length(TPA2);
+  if Len1 <> Len2 then
+    Exit
+  else if Len1 = 0 then
+    Exit(True);
+  PtPtrP1 := @TPA1[0];
+  PtPtrP2 := @TPA2[0];
+  for Idx := 0 to Len1 - 1 do
+  begin
+    if PtPtrP1^ <> PtPtrP2^ then
+      Exit;
+    Inc(PtPtrP1);
+    Inc(PtPtrP2);
+  end;
+  Result := True;
+end;
+
+procedure SortTPAByX(var TPA: TPointArray);
+var
+  Lo, Hi, Idx, GapIdx, Gap, Idx2: Integer;
+  Pt: TPoint;
+const
+  SHELLGAPS: array[0..15] of Integer = (345152, 153401, 68178, 30301, 13467, 5985, 2660, 1182, 525, 233, 103, 46, 20, 9, 4, 1);
+begin
+  Lo := Low(TPA); Hi := High(TPA);
+  if Hi - Lo + 1 <= 1 then Exit;
+  for GapIdx := 0 to 15 do
+  begin
+    Gap := SHELLGAPS[GapIdx];
+    for Idx := Lo + Gap to Hi do
+    begin
+      Pt := TPA[Idx];
+      Idx2 := Idx;
+      while ((Idx2 >= Gap) and (TPA[Idx2 - Gap].X > Pt.X)) do
+      begin
+        TPA[Idx2] := TPA[Idx2 - Gap];
+        Idx2 := Idx2 - Gap;
+      end;
+      TPA[Idx2] := Pt;
+    end;
+  end;
+end;
+
+procedure SortTPAByY(var TPA: TPointArray);
+var
+  Lo, Hi, Idx, GapIdx, Gap, Idx2: Integer;
+  Pt: TPoint;
+const
+  SHELLGAPS: array[0..15] of Integer = (345152, 153401, 68178, 30301, 13467, 5985, 2660, 1182, 525, 233, 103, 46, 20, 9, 4, 1);
+begin
+  Lo := Low(TPA); Hi := High(TPA);
+  if Hi - Lo + 1 <= 1 then Exit;
+  for GapIdx := 0 to 15 do
+  begin
+    Gap := SHELLGAPS[GapIdx];
+    for Idx := Lo + Gap to Hi do
+    begin
+      Pt := TPA[Idx];
+      Idx2 := Idx;
+      while ((Idx2 >= Gap) and (TPA[Idx2 - Gap].Y > Pt.Y)) do
+      begin
+        TPA[Idx2] := TPA[Idx2 - Gap];
+        Idx2 := Idx2 - Gap;
+      end;
+      TPA[Idx2] := Pt;
+    end;
+  end;
+end;
+
+function SplitTPA(const TPA: TPointArray; const Dist: Integer): T2DPointArray;
+var
+  Len, DistSqr, ResPos, ResAPos, Idx, IdxCheck, XDiff, YDiff: Integer;
+  Points: TPointArray;
+  Checked: TBoolArray;
+  Active: TSimpleStack<TPoint>;
+  Pt, PtCheck: TPoint;
+begin
+  // Setup
+  Len := Length(TPA);
+  if Len = 0 then Exit;
+  DistSqr := Dist * Dist;
+  Points := Copy(TPA);
+  SortTPAByX(Points); // Sort by X for sweepline
+  SetLength(Checked, Len);
+  FillChar(Checked[0], Len * SizeOf(Boolean), 0); // Set all values in Checked to False
+  SetLength(Result, Len);
+  ResPos := 0;
+  Idx := 0;
+  Active.Setup;
+  // Start sweep
+  while Idx < Len do
+  begin
+    if not Checked[Idx] then
+    begin
+      // Init new result array
+      SetLength(Result[ResPos], 1);
+      Pt := Points[Idx];
+      Result[ResPos][0] := Pt;
+      ResAPos := 1;
+      Checked[Idx] := True;
+      Active.Push(Pt);
+      // Process current point
+      while not Active.IsEmpty do
+      begin
+        Pt := Active.Pop;
+        IdxCheck := Idx + 1;
+        // Evaluate remaining points
+        while IdxCheck < Len do
+        begin
+          if not Checked[IdxCheck] then
+          begin
+            PtCheck := Points[IdxCheck];
+            XDiff := PtCheck.X - Pt.X;
+            // If the next point has an X distance larger than the allowed distance, all of the following
+            // points are out of range, as the points were sorted by increasing X coordinate.
+            if XDiff > Dist then Break;
+            YDiff := PtCheck.Y - Pt.Y;
+            if XDiff * XDiff + YDiff * YDiff <= DistSqr then
+            begin
+              Active.Push(PtCheck);
+              SetLength(Result[ResPos], ResAPos + 1);
+              Result[ResPos][ResAPos] := PtCheck;
+              Checked[IdxCheck] := True;
+              Inc(ResAPos);
+              if IdxCheck = Idx + 1 then
+                Inc(Idx);
+            end;
+          end;
+          Inc(IdxCheck);
+        end;
+      end;
+      Inc(ResPos);
+    end;
+    Inc(Idx);
+  end;
+  SetLength(Result, ResPos);
+end;
+
+function SplitTPAEx(const TPA: TPointArray; const XMax, YMax: Integer): T2DPointArray;
+var
+  Len, ResPos, ResAPos, Idx, IdxCheck, XDiff, YDiff: Integer;
+  Points: TPointArray;
+  Checked: TBoolArray;
+  Active: TSimpleStack<TPoint>;
+  Pt, PtCheck: TPoint;
+begin
+  // Setup
+  Len := Length(TPA);
+  if Len = 0 then Exit;
+  Points := Copy(TPA);
+  SortTPAByX(Points); // Sort by X for sweepline
+  SetLength(Checked, Len);
+  FillChar(Checked[0], Len * SizeOf(Boolean), 0); // Set all values in Checked to False
+  SetLength(Result, Len);
+  ResPos := 0;
+  Idx := 0;
+  Active.Setup;
+  // Start sweep
+  while Idx < Len do
+  begin
+    if not Checked[Idx] then
+    begin
+      // Init new result array
+      SetLength(Result[ResPos], 1);
+      Pt := Points[Idx];
+      Result[ResPos][0] := Pt;
+      ResAPos := 1;
+      Checked[Idx] := True;
+      Active.Push(Pt);
+      // Process current point
+      while not Active.IsEmpty do
+      begin
+        Pt := Active.Pop;
+        IdxCheck := Idx + 1;
+        // Evaluate remaining points
+        while IdxCheck < Len do
+        begin
+          if not Checked[IdxCheck] then
+          begin
+            PtCheck := Points[IdxCheck];
+            XDiff := PtCheck.X - Pt.X;
+            // If the next point has an X distance larger than the allowed distance, all of the following
+            // points are out of range, as the points were sorted by increasing X coordinate.
+            if XDiff > XMax then Break;
+            YDiff := PtCheck.Y - Pt.Y;
+            if (XDiff <= XMax) and (YDiff <= YMax) then
+            begin
+              Active.Push(PtCheck);
+              SetLength(Result[ResPos], ResAPos + 1);
+              Result[ResPos][ResAPos] := PtCheck;
+              Checked[IdxCheck] := True;
+              Inc(ResAPos);
+              if IdxCheck = Idx + 1 then
+                Inc(Idx);
+            end;
+          end;
+          Inc(IdxCheck);
+        end;
+      end;
+      Inc(ResPos);
+    end;
+    Inc(Idx);
+  end;
+  SetLength(Result, ResPos);
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -337,6 +641,11 @@ initialization
     Engine.AddFunction(@ReverseTPA, 'procedure ReverseTPA(var TPA: TPointArray);'); //
     Engine.AddFunction(@TPAToStr, 'function TPAToStr(const TPA: TPointArray): string;'); //
     Engine.AddFunction(@TPASpread, 'procedure TPASpread(const TPA: TPointArray; out XSpread, YSpread: Extended);');
+    Engine.AddFunction(@TPAEquals, 'function TPAEquals(const TPA1, TPA2: TPointArray): Boolean;'); //
+    Engine.AddFunction(@SortTPAByX, 'procedure SortTPAByX(var TPA: TPointArray);');
+    Engine.AddFunction(@SortTPAByY, 'procedure SortTPAByY(var TPA: TPointArray);');
+    Engine.AddFunction(@SplitTPA, 'function SplitTPA(const TPA: TPointArray; const Dist: Integer): T2DPointArray;'); //
+    Engine.AddFunction(@SplitTPAEx, 'function SplitTPAEx(const TPA: TPointArray; const XMax, YMax: Integer): T2DPointArray;'); //
   end);
 {$ENDIF}
 end.
