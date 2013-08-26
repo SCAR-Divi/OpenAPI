@@ -14,6 +14,14 @@ For more information, visit the [Creative Commons website](http://creativecommon
 Portions of the library contributed by other users may potentially be covered under a different license.
 These portions with their appropriate licenses will be listed in this file.
 
+### 3rd Party Libraries
+
+The OpenAPI includes several third party libraries, which are used in the API. These each have their own
+individual license, as listed:
+
+* [Delphi ZLib](http://www.base2ti.com/?id=delphi.zlib): ?
+* [TPerlRegEx](http://www.regular-expressions.info/delphi.html): Mozilla Public License 1.1
+
 Requirements
 ------------
 

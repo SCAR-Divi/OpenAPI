@@ -11,6 +11,8 @@ interface
 uses
   System.Types, System.Math, System.SysUtils,
 
+  PerlRegEx,
+
   {$IFDEF EXPORTS}uPSComponent, uEngine_PascalScript,{$ENDIF}
 
   OpenAPI.Globals;
@@ -166,6 +168,37 @@ procedure ReverseTPA(var TPA: TPointArray);
 ///	</returns>
 {$ENDREGION}
 function TPAToStr(const TPA: TPointArray): string;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Converts a string to a <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
+///	</summary>
+///	<param name="Str">
+///	  The string containing the points.
+///	</param>
+///	<remarks>
+///	  The conversion of the string is done using a flexible regular expression:
+///	  (-?\d+)\s*,\s*(-?\d+)
+///	  <note type="note">
+///	    Match the regular expression below and capture its match into backreference number 1
+///	    «(-?\d+)»<br />    Match the character “-” literally «-?»<br />        Between zero and one
+///	    times, as many times as possible, giving back as needed (greedy) «?»<br />    Match a
+///	    single digit 0..9 «\d+»<br />        Between one and unlimited times, as many times as
+///	    possible, giving back as needed (greedy) «+»<br />Match a single character that is a
+///	    “whitespace character” (spaces, tabs, and line breaks) «\s*»<br />    Between zero and
+///	    unlimited times, as many times as possible, giving back as needed (greedy) «*»<br />Match
+///	    the character “,” literally «,»<br />Match a single character that is a “whitespace
+///	    character” (spaces, tabs, and line breaks) «\s*»<br />    Between zero and unlimited times,
+///	    as many times as possible, giving back as needed (greedy) «*»<br />Match the regular
+///	    expression below and capture its match into backreference number 2 «(-?\d+)»<br />    Match
+///	    the character “-” literally «-?»<br />        Between zero and one times, as many times as
+///	    possible, giving back as needed (greedy) «?»<br />    Match a single digit 0..9 «\d+»
+///	    <br />        Between one and unlimited times, as many times as possible, giving back as
+///	    needed (greedy) «+»
+///	  </note>
+///	</remarks>
+{$ENDREGION}
+function StrToTPA(const Str: string): TPointArray;
 
 {$REGION 'Documentation'}
 ///	<summary>
@@ -362,6 +395,50 @@ function TPABounds(const TPA: TPointArray): TBox;
 {$ENDREGION}
 function TPAContains(const TPA: TPointArray; const Point: TPoint): Boolean; inline;
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Determines the dimensions of the smallest box which can encase all of the points in
+///	  <paramref name="TPA" />.
+///	</summary>
+///	<param name="TPA">
+///	  The array to evaluate.
+///	</param>
+///	<param name="Width">
+///	  The outputted width.
+///	</param>
+///	<param name="Height">
+///	  The outputted height.
+///	</param>
+{$ENDREGION}
+procedure TPADimensions(const TPA: TPointArray; out Width, Height: Integer);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Returns the area of the smallest box that can encase all of the points in
+///	  <paramref name="TPA" />.
+///	</summary>
+///	<param name="TPA">
+///	  The array to evaluate.
+///	</param>
+///	<returns>
+///	  The area of <paramref name="TPA" />.
+///	</returns>
+{$ENDREGION}
+function TPAArea(const TPA: TPointArray): Integer;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Returns the density of the points within the area of <paramref name="TPA" />.
+///	</summary>
+///	<param name="TPA">
+///	  The array to evaluate.
+///	</param>
+///	<returns>
+///	  The density of <paramref name="TPA" />.
+///	</returns>
+{$ENDREGION}
+function TPADensity(const TPA: TPointArray): Extended;
+
 implementation
 
 procedure SortTPA(var TPA: TPointArray);
@@ -418,15 +495,15 @@ end;
 
 procedure OffsetTPA(var TPA: TPointArray; const XOffset, YOffset: Integer); inline;
 var
-  PtPtr, PtPtrMax: PPoint;
+  CurPtr, MaxPtr: PPoint;
 begin
-  PtPtr := @TPA[0];
-  PtPtrMax := PtPtr; Inc(PtPtrMax, Length(TPA));
-  while PtPtr <> PtPtrMax do
+  CurPtr := @TPA[0];
+  MaxPtr := CurPtr; Inc(MaxPtr, Length(TPA));
+  while CurPtr <> MaxPtr do
   begin
-    Inc(PtPtr^.X, XOffset);
-    Inc(PtPtr^.Y, YOffset);
-    Inc(PtPtr);
+    Inc(CurPtr^.X, XOffset);
+    Inc(CurPtr^.Y, YOffset);
+    Inc(CurPtr);
   end;
 end;
 
@@ -443,39 +520,63 @@ end;
 procedure ReverseTPA(var TPA: TPointArray);
 var
   Pt: TPoint;
-  PtPtrLeft, PtPtrRight: PPoint;
+  LeftPtr, RightPtr: PPoint;
   Idx, Hi, Mid: Integer;
 begin
   Hi := High(TPA);
   if Hi < 1 then Exit;
   Mid := Hi div 2;
-  PtPtrLeft := @TPA[0];
-  PtPtrRight := @TPA[Hi];
+  LeftPtr := @TPA[0];
+  RightPtr := @TPA[Hi];
   for Idx := 0 to Mid do
   begin
-    Pt := PtPtrLeft^;
-    PtPtrLeft^ := PtPtrRight^;
-    PtPtrRight^ := Pt;
-    Inc(PtPtrLeft);
-    Dec(PtPtrRight);
+    Pt := LeftPtr^;
+    LeftPtr^ := RightPtr^;
+    RightPtr^ := Pt;
+    Inc(LeftPtr);
+    Dec(RightPtr);
   end;
 end;
 
 function TPAToStr(const TPA: TPointArray): string;
 var
-  PtPtr: PPoint;
+  CurPtr: PPoint;
   Idx, Hi: Integer;
 begin
   Hi := High(TPA);
   if Hi >= 0 then Exit('');
-  PtPtr := @TPA[0];
+  CurPtr := @TPA[0];
   Result := '';
   for Idx := 0 to Hi do
   begin
-    Result := Result + '(' + IntToStr(PtPtr^.X) + ',' + IntToStr(PtPtr^.Y) + ')';
+    Result := Result + '(' + IntToStr(CurPtr^.X) + ',' + IntToStr(CurPtr^.Y) + ')';
     if Idx <> Hi then
       Result := Result + ';';
-    Inc(PtPtr);
+    Inc(CurPtr);
+  end;
+end;
+
+function StrToTPA(const Str: string): TPointArray;
+var
+  Regex: TPerlRegEx;
+  l: Integer;
+begin
+  SetLength(Result, 0);
+  if Str = '' then Exit;
+  Regex := TPerlRegEx.Create;
+  try
+    Regex.Options := [preCaseLess];
+    Regex.RegEx := '(-?\d+)\s*,\s*(-?\d+)';
+    Regex.Subject := Str;
+    if Regex.Match then
+      repeat
+        l := Length(Result);
+        SetLength(Result, l + 1);
+        Result[l].X := StrToInt(Regex.Groups[1]);
+        Result[l].Y := StrToInt(Regex.Groups[2]);
+      until not Regex.MatchAgain;
+  finally
+    Regex.Free;
   end;
 end;
 
@@ -483,24 +584,24 @@ procedure TPASpread(const TPA: TPointArray; out XSpread, YSpread: Extended);
 var
   XValues, YValues: array of Extended;
   Len: Integer;
-  PtPtr, PtPtrMax: PPoint;
+  CurPtr, MaxPtr: PPoint;
   XPtr, YPtr: PExtended;
 begin
   Len := Length(TPA);
   SetLength(XValues, Len);
   SetLength(YValues, Len);
   // Set up pointers
-  PtPtr := @TPA[0];
-  PtPtrMax := PtPtr;
-  Inc(PtPtrMax, Len);
+  CurPtr := @TPA[0];
+  MaxPtr := CurPtr;
+  Inc(MaxPtr, Len);
   XPtr := @XValues[0];
   YPtr := @YValues[0];
   // Split coordinates
-  while PtPtr <> PtPtrMax do
+  while CurPtr <> MaxPtr do
   begin
-    XPtr^ := PtPtr^.X;
-    YPtr^ := PtPtr^.Y;
-    Inc(PtPtr);
+    XPtr^ := CurPtr^.X;
+    YPtr^ := CurPtr^.Y;
+    Inc(CurPtr);
     Inc(XPtr);
     Inc(YPtr);
   end;
@@ -512,7 +613,7 @@ end;
 function TPAEquals(const TPA1, TPA2: TPointArray): Boolean; inline;
 var
   Idx, Len1, Len2: Integer;
-  PtPtrP1, PtPtrP2: PPoint;
+  Ptr1, Ptr2: PPoint;
 begin
   Result := False;
   Len1 := Length(TPA1);
@@ -521,14 +622,14 @@ begin
     Exit
   else if Len1 = 0 then
     Exit(True);
-  PtPtrP1 := @TPA1[0];
-  PtPtrP2 := @TPA2[0];
+  Ptr1 := @TPA1[0];
+  Ptr2 := @TPA2[0];
   for Idx := 0 to Len1 - 1 do
   begin
-    if PtPtrP1^ <> PtPtrP2^ then
+    if Ptr1^ <> Ptr2^ then
       Exit;
-    Inc(PtPtrP1);
-    Inc(PtPtrP2);
+    Inc(Ptr1);
+    Inc(Ptr2);
   end;
   Result := True;
 end;
@@ -722,34 +823,34 @@ end;
 procedure FillTPA(var TPA: TPointArray; const Value: TPoint);
 var
   Len: Integer;
-  Cur, Max: PPoint;
+  CurPtr, MaxPtr: PPoint;
 begin
   Len := Length(TPA);
   if Len = 0 then Exit;
-  Cur := @TPA[0];
-  Max := @TPA[0];
-  Inc(Max, Len);
+  CurPtr := @TPA[0];
+  MaxPtr := @TPA[0];
+  Inc(MaxPtr, Len);
   repeat
-    Cur^ := Value;
-    Inc(Cur);
-  until Cur = Max;
+    CurPtr^ := Value;
+    Inc(CurPtr);
+  until CurPtr = MaxPtr;
 end;
 
 procedure FillTPAEx(var TPA: TPointArray; const Values: TPointArray);
 var
   Idx, Len, VLen: Integer;
-  Cur: PPoint;
+  CurPtr: PPoint;
 begin
   Len := Length(TPA);
   if Len = 0 then Exit;
   VLen := Length(Values);
   if VLen = 0 then
     raise ETPAException.Create('No values given!');
-  Cur := @TPA[0];
+  CurPtr := @TPA[0];
   for Idx := 0 to Len - 1 do
   begin
-    Cur^ := Values[Idx mod VLen];
-    Inc(Cur);
+    CurPtr^ := Values[Idx mod VLen];
+    Inc(CurPtr);
   end;
 end;
 
@@ -783,42 +884,64 @@ end;
 function TPABounds(const TPA: TPointArray): TBox;
 var
   Len: Integer;
-  PtPtr, PtPtrMax: PPoint;
+  CurPtr, MaxPtr: PPoint;
 begin
   Len := Length(TPA);
   if Len = 0 then Exit;
   with Result do
   begin
-    PtPtr := @TPA[0];
-    x1 := PtPtr^.X;
-    y1 := PtPtr^.Y;
-    x2 := PtPtr^.X;
-    y2 := PtPtr^.Y;
+    CurPtr := @TPA[0];
+    X1 := CurPtr^.X;
+    Y1 := CurPtr^.Y;
+    X2 := CurPtr^.X;
+    Y2 := CurPtr^.Y;
     if Len = 1 then Exit;
-    PtPtrMax := @TPA[0];
-    Inc(PtPtrMax, Len);
+    MaxPtr := @TPA[0];
+    Inc(MaxPtr, Len);
     repeat
-      if x1 > PtPtr^.X then x1 := PtPtr^.X else
-        if x2 < PtPtr^.X then x2 := PtPtr^.X;
-      if y1 > PtPtr^.Y then y1 := PtPtr^.Y else
-        if y2 < PtPtr^.Y then y2 := PtPtr^.Y;
-      Inc(PtPtr);
-    until PtPtr = PtPtrMax;
+      if X1 > CurPtr^.X then X1 := CurPtr^.X else
+        if X2 < CurPtr^.X then X2 := CurPtr^.X;
+      if Y1 > CurPtr^.Y then Y1 := CurPtr^.Y else
+        if Y2 < CurPtr^.Y then Y2 := CurPtr^.Y;
+      Inc(CurPtr);
+    until CurPtr = MaxPtr;
   end;
 end;
 
 function TPAContains(const TPA: TPointArray; const Point: TPoint): Boolean; inline;
 var
-  PtPtr, PtPtrMax: PPoint;
+  CurPtr, MaxPtr: PPoint;
 begin
   Result := False;
-  PtPtr := @TPA[0];
-  PtPtrMax := PtPtr; Inc(PtPtrMax, Length(TPA));
-  while PtPtr <> PtPtrMax do
+  CurPtr := @TPA[0];
+  MaxPtr := CurPtr; Inc(MaxPtr, Length(TPA));
+  while CurPtr <> MaxPtr do
   begin
-    if (PtPtr^.X = Point.X) and (PtPtr^.Y = Point.Y) then Exit(True);
-    Inc(PtPtr);
+    if (CurPtr^.X = Point.X) and (CurPtr^.Y = Point.Y) then Exit(True);
+    Inc(CurPtr);
   end;
+end;
+
+procedure TPADimensions(const TPA: TPointArray; out Width, Height: Integer);
+var
+  Box: TBox;
+begin
+  Box := TPABounds(TPA);
+  Width := Box.X2 - Box.X1 + 1;
+  Height := Box.Y2 - Box.Y1 + 1;
+end;
+
+function TPAArea(const TPA: TPointArray): Integer;
+var
+  Width, Height: Integer;
+begin
+  TPADimensions(TPA, Width, Height);
+  Result := Width * Height;
+end;
+
+function TPADensity(const TPA: TPointArray): Extended;
+begin
+  Result := Length(TPA) / TPAArea(TPA);
 end;
 
 initialization
@@ -835,6 +958,7 @@ initialization
     Engine.AddFunction(@CopyTPAEx, 'function CopyTPAEx(const TPA: TPointArray; const Index, Count: Integer): TPointArray;'); //
     Engine.AddFunction(@ReverseTPA, 'procedure ReverseTPA(var TPA: TPointArray);'); //
     Engine.AddFunction(@TPAToStr, 'function TPAToStr(const TPA: TPointArray): string;'); //
+    Engine.AddFunction(@StrToTPA, 'function StrToTPA(const Str: string): TPointArray;'); //
     Engine.AddFunction(@TPASpread, 'procedure TPASpread(const TPA: TPointArray; out XSpread, YSpread: Extended);');
     Engine.AddFunction(@TPAEquals, 'function TPAEquals(const TPA1, TPA2: TPointArray): Boolean;'); //
     Engine.AddFunction(@SortTPAByX, 'procedure SortTPAByX(var TPA: TPointArray);');
@@ -847,6 +971,9 @@ initialization
     Engine.AddFunction(@TPAPopEx, 'function TPAPopEx(var TPA: TPointArray; const Front: Boolean): TPoint;');
     Engine.AddFunction(@TPABounds, 'function TPABounds(const TPA: TPointArray): TBox;'); //
     Engine.AddFunction(@TPAContains, 'function TPAContains(const TPA: TPointArray; const Point: TPoint): Boolean;'); //
+    Engine.AddFunction(@TPADimensions, 'procedure TPADimensions(const TPA: TPointArray; out Width, Height: Integer);'); //
+    Engine.AddFunction(@TPAArea, 'function TPAArea(const TPA: TPointArray): Integer;'); //
+    Engine.AddFunction(@TPADensity, 'function TPADensity(const TPA: TPointArray): Extended;'); //
   end);
 {$ENDIF}
 end.

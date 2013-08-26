@@ -89,7 +89,33 @@ type
   ///	</summary>
   {$ENDREGION}
   TBox = record
-    X1, Y1, X2, Y2: Integer;
+    {$REGION 'Documentation'}
+    ///	<summary>
+    ///	  The x-coordinate of the upper-left corner of the box.
+    ///	</summary>
+    {$ENDREGION}
+    X1: Integer;
+
+    {$REGION 'Documentation'}
+    ///	<summary>
+    ///	  The y-coordinate of the upper-left corner of the box.
+    ///	</summary>
+    {$ENDREGION}
+    Y1: Integer;
+
+    {$REGION 'Documentation'}
+    ///	<summary>
+    ///	  The x-coordinate of the lower-right corner of the box.
+    ///	</summary>
+    {$ENDREGION}
+    X2: Integer;
+
+    {$REGION 'Documentation'}
+    ///	<summary>
+    ///	  The y-coordinate of the lower-right corner of the box.
+    ///	</summary>
+    {$ENDREGION}
+    Y2: Integer;
   private
     function GetWidth: Integer;
     function GetHeight: Integer;
