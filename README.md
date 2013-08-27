@@ -1,12 +1,10 @@
-SCAR Divi OpenAPI
-=================
+# [SCAR Divi](http://www.scar-divi.com) OpenAPI
 
 The OpenAPI library is an open-source portion of SCAR Divi's Core library. The goal of this library is to
 give developers easy access to functions from the Core API, to build plugin libraries, as well as allowing
 users to actively contribute to the development of the Core API.
 
-License
--------
+## License
 
 This library is licensed under a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 For more information, visit the [Creative Commons website](http://creativecommons.org/licenses/by-nc-nd/3.0/).
@@ -22,15 +20,13 @@ individual license, as listed:
 * [Delphi ZLib](http://www.base2ti.com/?id=delphi.zlib): ?
 * [TPerlRegEx](http://www.regular-expressions.info/delphi.html): Mozilla Public License 1.1
 
-Requirements
-------------
+## Requirements
 
 The library is develop using Embarcadero Delphi XE2. This is it's main and only supported target. It's
 possible that it will also compile in older or newer versions of Embarcero Delphi, but this is not
 quaranteed.
 
-Documentation
--------------
+## Documentation
 
 Documentation for the API is available at [openapi.scar-divi.com](http://openapi.scar-divi.com/).
 An offline chm copy of the documentation can be [downloaded](http://openapi.scar-divi.com/OpenAPI.chm) as
