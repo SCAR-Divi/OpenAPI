@@ -24,13 +24,6 @@ const
 type
   {$REGION 'Documentation'}
   ///	<summary>
-  ///	  A pointer to a TPoint value.
-  ///	</summary>
-  {$ENDREGION}
-  PPoint = ^TPoint;
-
-  {$REGION 'Documentation'}
-  ///	<summary>
   ///	  A dynamic array of TPoint values.
   ///	</summary>
   {$ENDREGION}

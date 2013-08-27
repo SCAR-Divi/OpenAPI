@@ -475,6 +475,44 @@ function TPADelete(var TPA: TPointArray; const Index: Integer): TPoint;
 {$ENDREGION}
 procedure TPAReplace(var TPA: TPointArray; const OldPoint, NewPoint: TPoint);
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Joins two sets of arrays representing x- and y-coordinates into an array of points.
+///	</summary>
+///	<param name="XValues">
+///	  The x-coordinates.
+///	</param>
+///	<param name="YValues">
+///	  The y-coordinates.
+///	</param>
+///	<returns>
+///	  The resulting array of points with <paramref name="XValues" /> and <paramref name="YValues" />
+///	   as coordinate components.
+///	</returns>
+///	<exception cref="ETPAException">
+///	  If the length of <paramref name="XValues" /> does not equal that of <paramref name="YValues" />
+///	  .
+///	</exception>
+{$ENDREGION}
+function TPAZip(const XValues, YValues: TIntArray): TPointArray;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Splits up the coordinates of <paramref name="TPA" /> into separate arrays for x- and
+///	  y-coordinates.
+///	</summary>
+///	<param name="TPA">
+///	  The array of points which will be split up.
+///	</param>
+///	<param name="XValues">
+///	  The resulting x-coordinates.
+///	</param>
+///	<param name="YValues">
+///	  The resulting y-coordinates.
+///	</param>
+{$ENDREGION}
+procedure TPAUnzip(const TPA: TPointArray; out XValues, YValues: TIntArray);
+
 implementation
 
 procedure SortTPA(var TPA: TPointArray);
@@ -1011,6 +1049,58 @@ begin
   end;
 end;
 
+function TPAZip(const XValues, YValues: TIntArray): TPointArray;
+var
+  LenX, LenY: Integer;
+  XPtr, YPtr: PInteger;
+  CurPtr, MaxPtr: PPoint;
+begin
+  LenX := Length(XValues);
+  LenY := Length(YValues);
+  if LenX <> LenY then
+    raise ETPAException.Create('Input arrays not of equal length');
+  SetLength(Result, LenX);
+  if LenX = 0 then
+    Exit;
+  XPtr := @XValues[0];
+  YPtr := @YValues[0];
+  CurPtr := @Result[0];
+  MaxPtr := CurPtr; Inc(MaxPtr, LenX);
+  while CurPtr <> MaxPtr do
+  begin
+    CurPtr^.X := XPtr^;
+    CurPtr^.Y := YPtr^;
+    Inc(XPtr);
+    Inc(YPtr);
+    Inc(CurPtr);
+  end;
+end;
+
+procedure TPAUnzip(const TPA: TPointArray; out XValues, YValues: TIntArray);
+var
+  Len: Integer;
+  XPtr, YPtr: PInteger;
+  CurPtr, MaxPtr: PPoint;
+begin
+  Len := Length(TPA);
+  SetLength(XValues, Len);
+  SetLength(YValues, Len);
+  if Len = 0 then
+    Exit;
+  XPtr := @XValues[0];
+  YPtr := @YValues[0];
+  CurPtr := @TPA[0];
+  MaxPtr := CurPtr; Inc(MaxPtr, Len);
+  while CurPtr <> MaxPtr do
+  begin
+    XPtr^ := CurPtr^.X;
+    YPtr^ := CurPtr^.Y;
+    Inc(XPtr);
+    Inc(YPtr);
+    Inc(CurPtr);
+  end;
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -1043,6 +1133,8 @@ initialization
     Engine.AddFunction(@TPADensity, 'function TPADensity(const TPA: TPointArray): Extended;'); //
     Engine.AddFunction(@TPADelete, 'function TPADelete(var TPA: TPointArray; const Index: Integer): TPoint;'); //
     Engine.AddFunction(@TPAReplace, 'procedure TPAReplace(var TPA: TPointArray; const OldPoint, NewPoint: TPoint);');
+    Engine.AddFunction(@TPAZip, 'function TPAZip(const XValues, YValues: TIntArray): TPointArray;');
+    Engine.AddFunction(@TPAUnzip, 'procedure TPAUnzip(const TPA: TPointArray; out XValues, YValues: TIntArray);');
   end);
 {$ENDIF}
 end.

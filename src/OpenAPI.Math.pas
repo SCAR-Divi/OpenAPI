@@ -8,9 +8,11 @@ unit OpenAPI.Math;
 interface
 
 uses
-  System.Math
+  System.Math, System.Types,
 
-  {$IFDEF EXPORTS}, uPSComponent, uEngine_PascalScript{$ENDIF};
+  {$IFDEF EXPORTS}uPSComponent, uEngine_PascalScript,{$ENDIF}
+
+  OpenAPI.Globals;
 
 {$REGION 'Documentation'}
 ///	<summary>
@@ -54,10 +56,24 @@ function Distance(const X1, Y1, X2, Y2: Integer): Extended;
 ///	  The radius of the circle.
 ///	</param>
 ///	<returns>
-///	  True if (X, Y) falls in or on the circle at (CenterX, CenterY) with a given Radius.
+///	  True if (<paramref name="X" />, <paramref name="Y" />) falls in or on the circle at (
+///	  <paramref name="CenterX" />, <paramref name="CenterY" />) with a given Radius.
 ///	</returns>
 {$ENDREGION}
 function InCircle(const X, Y, CenterX, CenterY, Radius: Integer): Boolean; inline;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Generates a random point which falls within the given <paramref name="Box" />.
+///	</summary>
+///	<param name="Box">
+///	  The box from which a random point will be generated.
+///	</param>
+///	<returns>
+///	  The random point which falls inside of, or on the boundary of <paramref name="Box" />.
+///	</returns>
+{$ENDREGION}
+function RndBoxPoint(const Box: TBox): TPoint;
 
 implementation
 
@@ -75,6 +91,23 @@ begin
   Result := (X - CenterX) * (X - CenterX) + (Y - CenterY) * (Y - CenterY) <= Radius * Radius;
 end;
 
+function RndBoxPoint(const Box: TBox): TPoint;
+var
+  Width, Height, Rnd: Extended;
+begin
+  Width := Box.X2 - Box.X1;
+  Height := Box.Y2 - Box.Y1;
+  if (Width = 0) or (Height = 0) then
+  begin
+    Result.X := Box.X1 + Round(Width * Random);
+    Result.Y := Box.Y1 + Round(Height * Random);
+    Exit;
+  end;
+  Rnd := Width * Height * Random;
+  Result.X := Round(Rnd) mod Round(Width) + Box.X1;
+  Result.Y := Round(Rnd) div Round(Width) + Box.Y1;
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -82,6 +115,7 @@ initialization
   begin
     Engine.AddFunction(@Distance, 'function Distance(const X1, Y1, X2, Y2: Integer): Extended;'); //
     Engine.AddFunction(@InCircle, 'function InCircle(const X, Y, CX, CY, R: Integer): Boolean;'); //
+    Engine.AddFunction(@RndBoxPoint, 'function RndBoxPoint(const Box: TBox): TPoint;');
   end);
 {$ENDIF}
 end.
