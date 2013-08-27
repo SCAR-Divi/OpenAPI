@@ -1,3 +1,8 @@
+{$REGION 'Documentation'}
+///	<summary>
+///	  This namespace contains all functions relating to data compression.
+///	</summary>
+{$ENDREGION}
 unit OpenAPI.Compression;
 
 interface

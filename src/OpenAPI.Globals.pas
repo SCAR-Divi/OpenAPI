@@ -68,6 +68,8 @@ type
   {$ENDREGION}
   TIntArray = array of Integer;
 
+  T2DIntArray = array of TIntArray;
+
   {$REGION 'Documentation'}
   ///	<summary>
   ///	  A dynamic array of Boolean values.
@@ -283,6 +285,12 @@ type
     {$ENDREGION}
     class operator Explicit(const Box: TBox): string;
   end;
+
+  {$REGION 'Documentation'}
+  ///	<summary>
+  ///	  A dynamic array of <see cref="TBox">TBox</see> values.
+  ///	</summary>
+  {$ENDREGION}
   TBoxArray = array of TBox;
 
   {$REGION 'Documentation'}

@@ -158,7 +158,7 @@ procedure ReverseTPA(var TPA: TPointArray);
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Converts an array of two-dimensional points to a string.
+///	  Converts <paramref name="TPA" /> to a string.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The array which will be converted to a string.
@@ -439,6 +439,42 @@ function TPAArea(const TPA: TPointArray): Integer;
 {$ENDREGION}
 function TPADensity(const TPA: TPointArray): Extended;
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Deletes an element at <paramref name="Index" /> from <paramref name="TPA" />.
+///	</summary>
+///	<param name="TPA">
+///	  The array to modify.
+///	</param>
+///	<param name="Index">
+///	  The index of the element that has to be deleted.
+///	</param>
+///	<returns>
+///	  The element that was deleted.
+///	</returns>
+///	<exception cref="ETPAException">
+///	  If <paramref name="Index" /> is out of bounds.
+///	</exception>
+{$ENDREGION}
+function TPADelete(var TPA: TPointArray; const Index: Integer): TPoint;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Replaces all occurrences of <paramref name="OldPoint" /> in <paramref name="TPA" /> with
+///	  <paramref name="NewPoint" />.
+///	</summary>
+///	<param name="TPA">
+///	  The array to modify.
+///	</param>
+///	<param name="OldPoint">
+///	  The point value which will be replaced.
+///	</param>
+///	<param name="NewPoint">
+///	  The new point which <paramref name="OldPoint" /> is replaced with.
+///	</param>
+{$ENDREGION}
+procedure TPAReplace(var TPA: TPointArray; const OldPoint, NewPoint: TPoint);
+
 implementation
 
 procedure SortTPA(var TPA: TPointArray);
@@ -544,7 +580,7 @@ var
   Idx, Hi: Integer;
 begin
   Hi := High(TPA);
-  if Hi >= 0 then Exit('');
+  if Hi < 0 then Exit('');
   CurPtr := @TPA[0];
   Result := '';
   for Idx := 0 to Hi do
@@ -944,6 +980,37 @@ begin
   Result := Length(TPA) / TPAArea(TPA);
 end;
 
+function TPADelete(var TPA: TPointArray; const Index: Integer): TPoint;
+var
+  Len: Integer;
+begin
+  Len := Length(TPA);
+  if (Index < 0) or (Index >= Len) then
+    raise ETPAException.Create('Index out of bounds');
+  Result := TPA[Index];
+  if Index < Len - 1 then
+    Move(TPA[Index + 1], TPA[Index], (Len - Index - 1) * SizeOf(TPoint));
+  SetLength(TPA, Len - 1);
+end;
+
+procedure TPAReplace(var TPA: TPointArray; const OldPoint, NewPoint: TPoint);
+var
+  Len: Integer;
+  CurPtr, MaxPtr: PPoint;
+begin
+  Len := Length(TPA);
+  if Len = 0 then
+    Exit;
+  CurPtr := @TPA[0];
+  MaxPtr := CurPtr; Inc(MaxPtr, Len);
+  while CurPtr <> MaxPtr do
+  begin
+    if CurPtr^ = OldPoint then
+      CurPtr^ := NewPoint;
+    Inc(CurPtr);
+  end;
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -974,6 +1041,8 @@ initialization
     Engine.AddFunction(@TPADimensions, 'procedure TPADimensions(const TPA: TPointArray; out Width, Height: Integer);'); //
     Engine.AddFunction(@TPAArea, 'function TPAArea(const TPA: TPointArray): Integer;'); //
     Engine.AddFunction(@TPADensity, 'function TPADensity(const TPA: TPointArray): Extended;'); //
+    Engine.AddFunction(@TPADelete, 'function TPADelete(var TPA: TPointArray; const Index: Integer): TPoint;'); //
+    Engine.AddFunction(@TPAReplace, 'procedure TPAReplace(var TPA: TPointArray; const OldPoint, NewPoint: TPoint);');
   end);
 {$ENDIF}
 end.
