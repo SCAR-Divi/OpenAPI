@@ -513,6 +513,22 @@ function TPAZip(const XValues, YValues: TIntArray): TPointArray;
 {$ENDREGION}
 procedure TPAUnzip(const TPA: TPointArray; out XValues, YValues: TIntArray);
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Calculates the mean of the x) and y coordinates of <paramref name="TPA" /> and returns them as a TPoint.
+///	</summary>
+///	<param name="TPA">
+///	  The array to process.
+///	</param>
+///	<returns>
+///	  The mean point.
+///	</returns>
+///	<exception cref="ETPAException">
+///	  If <paramref name="TPA" /> is empty.
+///	</exception>
+{$ENDREGION}
+function TPAMean(const TPA: TPointArray): TPoint; inline;
+
 implementation
 
 procedure SortTPA(var TPA: TPointArray);
@@ -1101,6 +1117,29 @@ begin
   end;
 end;
 
+function TPAMean(const TPA: TPointArray): TPoint; inline;
+var
+  Len: Integer;
+  X, Y: Extended;
+  CurPtr, MaxPtr: PPoint;
+begin
+  Len := Length(TPA);
+  if Len = 0 then
+    raise ETPAException.Create('Array is empty');
+  X := 0;
+  Y := 0;
+  CurPtr := @TPA[0];
+  MaxPtr := @TPA[0];
+  Inc(MaxPtr, Len);
+  repeat
+    X := X + CurPtr^.X / Len;
+    Y := Y + CurPtr^.Y / Len;
+    Inc(CurPtr);
+  until CurPtr = MaxPtr;
+  Result.X := Round(X);
+  Result.Y := Round(Y);
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -1135,6 +1174,7 @@ initialization
     Engine.AddFunction(@TPAReplace, 'procedure TPAReplace(var TPA: TPointArray; const OldPoint, NewPoint: TPoint);');
     Engine.AddFunction(@TPAZip, 'function TPAZip(const XValues, YValues: TIntArray): TPointArray;');
     Engine.AddFunction(@TPAUnzip, 'procedure TPAUnzip(const TPA: TPointArray; out XValues, YValues: TIntArray);');
+    Engine.AddFunction(@TPAMean, 'function TPAMean(const TPA: TPointArray): TPoint;'); //
   end);
 {$ENDIF}
 end.
