@@ -529,6 +529,111 @@ procedure TPAUnzip(const TPA: TPointArray; out XValues, YValues: TIntArray);
 {$ENDREGION}
 function TPAMean(const TPA: TPointArray): TPoint; inline;
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Generates a random <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
+///	</summary>
+///	<param name="Count">
+///	  The number of items in the resulting array.
+///	</param>
+///	<param name="XRange">
+///	  The range of the x-coordinates.
+///	</param>
+///	<param name="YRange">
+///	  The range of the y-coordinates.
+///	</param>
+///	<returns>
+///	  The random array.
+///	</returns>
+///	<remarks>
+///	  Like the Random function, the range identifies the ceiling, not the maximum value. The
+///	  coordinates are chosen from the range "0 &lt;= Value &lt; Range".
+///	</remarks>
+{$ENDREGION}
+function RandomTPA(const Count, XRange, YRange: Integer): TPointArray;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Removes a the first occurrence of <paramref name="Point" /> in <paramref name="TPA" />.
+///	</summary>
+///	<param name="TPA">
+///	  The array which will be modified.
+///	</param>
+///	<param name="Point">
+///	  The point that will be removed.
+///	</param>
+{$ENDREGION}
+procedure TPARemove(var TPA: TPointArray; const Point: TPoint);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Removes points from <paramref name="TPA" />.
+///	</summary>
+///	<param name="TPA">
+///	  The array that will be modified.
+///	</param>
+///	<param name="Point">
+///	  The point that will be removed.
+///	</param>
+///	<param name="All">
+///	  If true, all occurrences of the point will be removed, otherwise just the first.
+///	</param>
+{$ENDREGION}
+procedure TPARemoveEx(var TPA: TPointArray; const Point: TPoint; const All: Boolean); inline;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Appends a point to <paramref name="TPA" />.
+///	</summary>
+///	<param name="TPA">
+///	  The array which <paramref name="Point" /> will be appended to.
+///	</param>
+///	<param name="Point">
+///	  The point which will be added.
+///	</param>
+///	<returns>
+///	  The index where <paramref name="Point" /> was added.
+///	</returns>
+{$ENDREGION}
+function TPAAppend(var TPA: TPointArray; const Point: TPoint): Integer; inline;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Returns the center of the box that encases the entire array.
+///	</summary>
+///	<param name="TPA">
+///	  The array which will be processed.
+///	</param>
+///	<returns>
+///	  The center of <paramref name="TPA" />.
+///	</returns>
+{$ENDREGION}
+function TPACenter(const TPA: TPointArray): TPoint;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Inserts a point into <paramref name="TPA" /> at a given position.
+///	</summary>
+///	<param name="TPA">
+///	  The array which will be modified.
+///	</param>
+///	<param name="Index">
+///	  The index where <paramref name="Point" /> will be inserted.
+///	</param>
+///	<param name="Point">
+///	  The point which will be inserted into <paramref name="TPA" />.
+///	</param>
+///	<returns>
+///	  The index was <paramref name="Point" /> will be inserted.
+///	</returns>
+///	<remarks>
+///	  If <paramref name="Index" /> is smaller than 0, the point will be inserted at index 0, which
+///	  is the first element of the array. If <paramref name="Index" /> is equal to or larger than
+///	  the length of the array, the point will be appended to the end of the array.
+///	</remarks>
+{$ENDREGION}
+function TPAInsert(var TPA: TPointArray; const Index: Integer; const Point: TPoint): Integer;
+
 implementation
 
 procedure SortTPA(var TPA: TPointArray);
@@ -1140,6 +1245,93 @@ begin
   Result.Y := Round(Y);
 end;
 
+function RandomTPA(const Count, XRange, YRange: Integer): TPointArray;
+var
+  Idx: Integer;
+begin
+  if Count <= 0 then
+  begin
+    SetLength(Result, 0);
+    Exit;
+  end;
+  SetLength(Result, Count);
+  for Idx := 0 to Count - 1 do
+  begin
+    Result[Idx].X := Random(XRange);
+    Result[Idx].Y := Random(YRange);
+  end;
+end;
+
+procedure TPARemove(var TPA: TPointArray; const Point: TPoint);
+begin
+  TPARemoveEx(TPA, Point, False);
+end;
+
+procedure TPARemoveEx(var TPA: TPointArray; const Point: TPoint; const All: Boolean); inline;
+var
+  Idx, ResIdx, Len: Integer;
+  ResTPA: TPointArray;
+  CurPtr: PPoint;
+begin
+  Len := Length(TPA);
+  if Len = 0 then Exit;
+  if All then
+  begin
+    SetLength(ResTPA, Len);
+    CurPtr := @TPA[0];
+    ResIdx := 0;
+    for Idx := 0 to Len - 1 do
+    begin
+      if (Point.X <> CurPtr^.X) or (Point.Y <> CurPtr^.Y) then
+      begin
+        ResTPA[ResIdx] := CurPtr^;
+        Inc(ResIdx);
+      end;
+      Inc(CurPtr);
+    end;
+    SetLength(ResTPA, ResIdx);
+    TPA := ResTPA;
+  end else
+    for Idx := 0 to Len - 1 do
+      if (Point.X = TPA[Idx].X) and (Point.Y = TPA[Idx].Y) then
+      begin
+        TPADelete(TPA, Idx);
+        Break;
+      end;
+end;
+
+function TPAAppend(var TPA: TPointArray; const Point: TPoint): Integer; inline;
+begin
+  Result := Length(TPA);
+  SetLength(TPA, Result + 1);
+  TPA[Result] := Point;
+end;
+
+function TPACenter(const TPA: TPointArray): TPoint;
+var
+  Box: TBox;
+begin
+  Box := TPABounds(TPA);
+  Result := TPoint.Create(Box.X1 + (Box.X2 - Box.X1 + 1) div 2, Box.Y1 + (Box.Y2 - Box.Y1 + 1) div 2);
+end;
+
+function TPAInsert(var TPA: TPointArray; const Index: Integer; const Point: TPoint): Integer;
+var
+  Idx, Len: Integer;
+begin
+  Len := Length(TPA);
+  if Index < 0 then
+    Result := 0
+  else if Index > Len then
+    Result := Len
+  else
+    Result := Index;
+  SetLength(TPA, Len + 1);
+  if Result <> Len then
+    Move(TPA[Result], TPA[Result + 1], (Len - Result) * SizeOf(TPoint));
+  TPA[Result] := Point;
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -1175,6 +1367,12 @@ initialization
     Engine.AddFunction(@TPAZip, 'function TPAZip(const XValues, YValues: TIntArray): TPointArray;');
     Engine.AddFunction(@TPAUnzip, 'procedure TPAUnzip(const TPA: TPointArray; out XValues, YValues: TIntArray);');
     Engine.AddFunction(@TPAMean, 'function TPAMean(const TPA: TPointArray): TPoint;'); //
+    Engine.AddFunction(@RandomTPA, 'function RandomTPA(const Count, XRange, YRange: Integer): TPointArray;'); //
+    Engine.AddFunction(@TPARemove, 'procedure TPARemove(var TPA: TPointArray; const Point: TPoint);'); //
+    Engine.AddFunction(@TPARemoveEx, 'procedure TPARemoveEx(var TPA: TPointArray; const Point: TPoint; const All: Boolean);'); //
+    Engine.AddFunction(@TPAAppend, 'function TPAAppend(var TPA: TPointArray; const Point: TPoint): Integer;'); //
+    Engine.AddFunction(@TPACenter, 'function TPACenter(const TPA: TPointArray): TPoint;'); //
+    Engine.AddFunction(@TPAInsert, 'function TPAInsert(var TPA: TPointArray; const Index: Integer; const Point: TPoint): Integer;'); //
   end);
 {$ENDIF}
 end.
