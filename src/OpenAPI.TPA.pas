@@ -515,7 +515,7 @@ procedure TPAUnzip(const TPA: TPointArray; out XValues, YValues: TIntArray);
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Calculates the mean of the x) and y coordinates of <paramref name="TPA" /> and returns them as a TPoint.
+///	  Calculates the mean of the x- and y coordinates of <paramref name="TPA" /> and returns them as a TPoint.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The array to process.
@@ -836,7 +836,7 @@ var
 begin
   Lo := Low(TPA); Hi := High(TPA);
   if Hi - Lo + 1 <= 1 then Exit;
-  for GapIdx := 0 to 15 do
+  for GapIdx := 0 to 25 do
   begin
     Gap := SHELLGAPS[GapIdx];
     for Idx := Lo + Gap to Hi do
@@ -860,7 +860,7 @@ var
 begin
   Lo := Low(TPA); Hi := High(TPA);
   if Hi - Lo + 1 <= 1 then Exit;
-  for GapIdx := 0 to 15 do
+  for GapIdx := 0 to 25 do
   begin
     Gap := SHELLGAPS[GapIdx];
     for Idx := Lo + Gap to Hi do
