@@ -61,6 +61,11 @@ type
   {$ENDREGION}
   TIntArray = array of Integer;
 
+  {$REGION 'Documentation'}
+  ///	<summary>
+  ///	  A 2-dimensional dynamic array of Integer values.
+  ///	</summary>
+  {$ENDREGION}
   T2DIntArray = array of TIntArray;
 
   {$REGION 'Documentation'}
@@ -69,6 +74,13 @@ type
   ///	</summary>
   {$ENDREGION}
   TBoolArray = array of Boolean;
+
+  {$REGION 'Documentation'}
+  ///	<summary>
+  ///	  A 2-dimensional dynamic array of Boolean values.
+  ///	</summary>
+  {$ENDREGION}
+  T2DBoolArray = array of TBoolArray;
 
   {$REGION 'Documentation'}
   ///	<summary>

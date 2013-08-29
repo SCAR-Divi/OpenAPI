@@ -634,6 +634,39 @@ function TPACenter(const TPA: TPointArray): TPoint;
 {$ENDREGION}
 function TPAInsert(var TPA: TPointArray; const Index: Integer; const Point: TPoint): Integer;
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Deletes a <see cref="OpenAPI.Globals|TPointArray" /> from a
+///	  <see cref="OpenAPI.Globals|T2DPointArray" /> at a given <paramref name="Index" />.
+///	</summary>
+///	<param name="ATPA">
+///	  The array that will be modified.
+///	</param>
+///	<param name="Index">
+///	  The index at which to delete the array.
+///	</param>
+///	<returns>
+///	  The array which was deleted from <paramref name="ATPA" />.
+///	</returns>
+{$ENDREGION}
+function ATPADelete(var ATPA: T2DPointArray; const Index: Integer): TPointArray;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Checks if TPA is found within ATPA.
+///	</summary>
+///	<param name="ATPA">
+///	  The array which will be searched inside of.
+///	</param>
+///	<param name="TPA">
+///	  The array which is being searched for.
+///	</param>
+///	<returns>
+///	  True if <paramref name="TPA" /> is found in <paramref name="ATPA" />.
+///	</returns>
+{$ENDREGION}
+function ATPAContains(const ATPA: T2DPointArray; const TPA: TPointArray): Boolean;
+
 implementation
 
 procedure SortTPA(var TPA: TPointArray);
@@ -1051,7 +1084,7 @@ end;
 
 function TPAPop(var TPA: TPointArray): TPoint;
 var
-  Idx, Len: Integer;
+  Len: Integer;
 begin
   Len := Length(TPA);
   if Len = 0 then
@@ -1062,7 +1095,7 @@ end;
 
 function TPAPopEx(var TPA: TPointArray; const Front: Boolean): TPoint;
 var
-  Idx, Len: Integer;
+  Len: Integer;
 begin
   if not Front then
     Result := TPAPop(TPA)
@@ -1317,7 +1350,7 @@ end;
 
 function TPAInsert(var TPA: TPointArray; const Index: Integer; const Point: TPoint): Integer;
 var
-  Idx, Len: Integer;
+  Len: Integer;
 begin
   Len := Length(TPA);
   if Index < 0 then
@@ -1330,6 +1363,29 @@ begin
   if Result <> Len then
     Move(TPA[Result], TPA[Result + 1], (Len - Result) * SizeOf(TPoint));
   TPA[Result] := Point;
+end;
+
+function ATPADelete(var ATPA: T2DPointArray; const Index: Integer): TPointArray;
+var
+  Idx, Len: Integer;
+begin
+  Len := Length(ATPA);
+  if (Index < 0) or (Index >= Len) then Exit;
+  Result := ATPA[Index];
+  for Idx := Index to Len - 2 do
+    ATPA[Idx] := ATPA[Idx + 1];
+  SetLength(ATPA, Len - 1);
+end;
+
+function ATPAContains(const ATPA: T2DPointArray; const TPA: TPointArray): Boolean;
+var
+  Idx, Len: Integer;
+begin
+  Len := Length(ATPA);
+  for Idx := 0 to Len - 1 do
+    if TPAEquals(ATPA[Idx], TPA) then
+      Exit(True);
+  Result := False;
 end;
 
 initialization
@@ -1373,6 +1429,8 @@ initialization
     Engine.AddFunction(@TPAAppend, 'function TPAAppend(var TPA: TPointArray; const Point: TPoint): Integer;'); //
     Engine.AddFunction(@TPACenter, 'function TPACenter(const TPA: TPointArray): TPoint;'); //
     Engine.AddFunction(@TPAInsert, 'function TPAInsert(var TPA: TPointArray; const Index: Integer; const Point: TPoint): Integer;'); //
+    Engine.AddFunction(@ATPADelete, 'function ATPADelete(var ATPA: T2DPointArray; const Index: Integer): TPointArray;');
+    Engine.AddFunction(@ATPAContains, 'function ATPAContains(const ATPA: T2DPointArray; const TPA: TPointArray): Boolean;');
   end);
 {$ENDIF}
 end.

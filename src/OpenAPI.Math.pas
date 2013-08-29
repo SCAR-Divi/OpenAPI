@@ -88,7 +88,7 @@ end;
 
 function InCircle(const X, Y, CenterX, CenterY, Radius: Integer): Boolean; inline;
 begin
-  Result := (X - CenterX) * (X - CenterX) + (Y - CenterY) * (Y - CenterY) <= Radius * Radius;
+  Result := Sqr(X - CenterX) + Sqr(Y - CenterY) <= Sqr(Radius);
 end;
 
 function RndBoxPoint(const Box: TBox): TPoint;
