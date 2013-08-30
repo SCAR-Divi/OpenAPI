@@ -653,7 +653,7 @@ function ATPADelete(var ATPA: T2DPointArray; const Index: Integer): TPointArray;
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Checks if TPA is found within ATPA.
+///	  Checks if <paramref name="TPA" /> is found within <paramref name="ATPA" />.
 ///	</summary>
 ///	<param name="ATPA">
 ///	  The array which will be searched inside of.
@@ -667,6 +667,16 @@ function ATPADelete(var ATPA: T2DPointArray; const Index: Integer): TPointArray;
 {$ENDREGION}
 function ATPAContains(const ATPA: T2DPointArray; const TPA: TPointArray): Boolean;
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Sorts <paramref name="TPA" /> row-by-row as if it were part of a grid.
+///	</summary>
+///	<param name="TPA">
+///	  The array which will be sorted.
+///	</param>
+{$ENDREGION}
+procedure SortTPAByRow(var TPA: TPointArray);
+
 implementation
 
 procedure SortTPA(var TPA: TPointArray);
@@ -676,15 +686,15 @@ end;
 
 procedure SortTPAEx(var TPA: TPointArray; const Point: TPoint);
 var
-  Lo, Hi, Idx, Idx2, GapIdx, Gap: Integer;
+  Hi, Idx, Idx2, GapIdx, Gap: Integer;
   PtDist, TmpX, TmpY: Extended; // Extended datatype to accommodate large coordinates
   Pt: TPoint;
   Dists: TExtArray;
 begin
-  Lo := Low(TPA); Hi := High(TPA);
-  if Hi - Lo + 1 <= 1 then Exit;
-  SetLength(Dists, Hi - Lo + 1);
-  for Idx := Lo to Hi do
+  Hi := High(TPA);
+  if Hi <= 0 then Exit;
+  SetLength(Dists, Hi + 1);
+  for Idx := 0 to Hi do
   begin
     TmpX := TPA[Idx].X - Point.X; TmpY := TPA[Idx].Y - Point.Y;
     Dists[Idx] := TmpX * TmpX + TmpY * TmpY; // No root to save computation time
@@ -692,7 +702,7 @@ begin
   for GapIdx := 0 to 25 do
   begin
     Gap := SHELLGAPS[GapIdx];
-    for Idx := Lo + Gap to Hi do
+    for Idx := Gap to Hi do
     begin
       PtDist := Dists[Idx];
       Pt := TPA[Idx];
@@ -864,15 +874,15 @@ end;
 
 procedure SortTPAByX(var TPA: TPointArray);
 var
-  Lo, Hi, Idx, GapIdx, Gap, Idx2: Integer;
+  Hi, Idx, GapIdx, Gap, Idx2: Integer;
   Pt: TPoint;
 begin
-  Lo := Low(TPA); Hi := High(TPA);
-  if Hi - Lo + 1 <= 1 then Exit;
+  Hi := High(TPA);
+  if Hi <= 0 then Exit;
   for GapIdx := 0 to 25 do
   begin
     Gap := SHELLGAPS[GapIdx];
-    for Idx := Lo + Gap to Hi do
+    for Idx := Gap to Hi do
     begin
       Pt := TPA[Idx];
       Idx2 := Idx;
@@ -888,15 +898,15 @@ end;
 
 procedure SortTPAByY(var TPA: TPointArray);
 var
-  Lo, Hi, Idx, GapIdx, Gap, Idx2: Integer;
+  Hi, Idx, GapIdx, Gap, Idx2: Integer;
   Pt: TPoint;
 begin
-  Lo := Low(TPA); Hi := High(TPA);
-  if Hi - Lo + 1 <= 1 then Exit;
+  Hi := High(TPA);
+  if Hi <= 0 then Exit;
   for GapIdx := 0 to 25 do
   begin
     Gap := SHELLGAPS[GapIdx];
-    for Idx := Lo + Gap to Hi do
+    for Idx := Gap to Hi do
     begin
       Pt := TPA[Idx];
       Idx2 := Idx;
@@ -1388,6 +1398,38 @@ begin
   Result := False;
 end;
 
+procedure SortTPAByRow(var TPA: TPointArray);
+var
+  Hi, Idx, Idx2, GapIdx, Gap, Pos, Width: Integer;
+  Pt: TPoint;
+  Positions: TIntArray;
+begin
+  Hi := High(TPA);
+  if Hi + 1 <= 1 then Exit;
+  TPADimensions(TPA, Width, Pos);
+  SetLength(Positions, Hi + 1);
+  for Idx := 0 to Hi do
+    Positions[Idx] := TPA[Idx].Y * Width + TPA[Idx].x;
+  for GapIdx := 0 to 25 do
+  begin
+    Gap := SHELLGAPS[GapIdx];
+    for Idx := Gap to Hi do
+    begin
+      Pos := Positions[Idx];
+      Pt := TPA[Idx];
+      Idx2 := Idx;
+      while ((Idx2 >= Gap) and (Positions[Idx2 - Gap] > Pos)) do
+      begin
+        Positions[Idx2] := Positions[Idx2 - Gap];
+        TPA[Idx2] := TPA[Idx2 - Gap];
+        Idx2 := Idx2 - Gap;
+      end;
+      Positions[Idx2] := Pos;
+      TPA[Idx2] := Pt;
+    end;
+  end;
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -1431,6 +1473,7 @@ initialization
     Engine.AddFunction(@TPAInsert, 'function TPAInsert(var TPA: TPointArray; const Index: Integer; const Point: TPoint): Integer;'); //
     Engine.AddFunction(@ATPADelete, 'function ATPADelete(var ATPA: T2DPointArray; const Index: Integer): TPointArray;');
     Engine.AddFunction(@ATPAContains, 'function ATPAContains(const ATPA: T2DPointArray; const TPA: TPointArray): Boolean;');
+    Engine.AddFunction(@SortTPAByRow, 'procedure SortTPAByRow(var TPA: TPointArray);'); //
   end);
 {$ENDIF}
 end.
