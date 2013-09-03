@@ -37,7 +37,7 @@ var
 begin
   Hi := High(TIA);
   if Hi < 0 then Exit('');
-  CurPtr := Pointer(TIA);
+  CurPtr := @TIA[0];
   Result := '';
   for Idx := 0 to Hi do
   begin

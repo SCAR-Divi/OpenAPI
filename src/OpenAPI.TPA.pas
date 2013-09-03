@@ -677,6 +677,32 @@ function ATPAContains(const ATPA: T2DPointArray; const TPA: TPointArray): Boolea
 {$ENDREGION}
 procedure SortTPAByRow(var TPA: TPointArray);
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Sorts <paramref name="TPA" /> column-by-column as if it were part of a grid.
+///	</summary>
+///	<param name="TPA">
+///	  The array which will be sorted.
+///	</param>
+{$ENDREGION}
+procedure SortTPAByColumn(var TPA: TPointArray);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Offsets the coordindates of a given <paramref name="ATPA" />.
+///	</summary>
+///	<param name="ATPA">
+///	  The arrays to be offset.
+///	</param>
+///	<param name="XOffset">
+///	  The x-coordinate offset value.
+///	</param>
+///	<param name="YOffset">
+///	  The y-coordinate offset value.
+///	</param>
+{$ENDREGION}
+procedure OffsetATPA(var ATPA: T2DPointArray; const XOffset, YOffset: Integer);
+
 implementation
 
 procedure SortTPA(var TPA: TPointArray);
@@ -1430,6 +1456,47 @@ begin
   end;
 end;
 
+procedure SortTPAByColumn(var TPA: TPointArray);
+var
+  Hi, Idx, Idx2, GapIdx, Gap, Pos, Height: Integer;
+  Pt: TPoint;
+  Positions: TIntArray;
+begin
+  Hi := High(TPA);
+  if Hi + 1 <= 1 then Exit;
+  TPADimensions(TPA, Pos, Height);
+  SetLength(Positions, Hi + 1);
+  for Idx := 0 to Hi do
+    Positions[Idx] := TPA[Idx].X * Height + TPA[Idx].y;
+  for GapIdx := 0 to 25 do
+  begin
+    Gap := SHELLGAPS[GapIdx];
+    for Idx := Gap to Hi do
+    begin
+      Pos := Positions[Idx];
+      Pt := TPA[Idx];
+      Idx2 := Idx;
+      while ((Idx2 >= Gap) and (Positions[Idx2 - Gap] > Pos)) do
+      begin
+        Positions[Idx2] := Positions[Idx2 - Gap];
+        TPA[Idx2] := TPA[Idx2 - Gap];
+        Idx2 := Idx2 - Gap;
+      end;
+      Positions[Idx2] := Pos;
+      TPA[Idx2] := Pt;
+    end;
+  end;
+end;
+
+procedure OffsetATPA(var ATPA: T2DPointArray; const XOffset, YOffset: Integer);
+var
+  Idx, Len: Integer;
+begin
+  Len := Length(ATPA);
+  for Idx := 0 to Len - 1 do
+    OffsetTPA(ATPA[Idx], XOffset, YOffset);
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -1474,6 +1541,8 @@ initialization
     Engine.AddFunction(@ATPADelete, 'function ATPADelete(var ATPA: T2DPointArray; const Index: Integer): TPointArray;');
     Engine.AddFunction(@ATPAContains, 'function ATPAContains(const ATPA: T2DPointArray; const TPA: TPointArray): Boolean;');
     Engine.AddFunction(@SortTPAByRow, 'procedure SortTPAByRow(var TPA: TPointArray);'); //
+    Engine.AddFunction(@SortTPAByColumn, 'procedure SortTPAByColumn(var TPA: TPointArray);');
+    Engine.AddFunction(@OffsetATPA, 'procedure OffsetATPA(var ATPA: T2DPointArray; const XOffset, YOffset: Integer);'); //
   end);
 {$ENDIF}
 end.
