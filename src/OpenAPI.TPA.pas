@@ -770,6 +770,20 @@ function ATPADensity(const ATPA: T2DPointArray): Extended;
 {$ENDREGION}
 procedure ReverseATPA(var ATPA: T2DPointArray);
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Merges all arrays in <paramref name="ATPA" /> into a single
+///	  <see cref="OpenAPI.Globals|TPointArray" /> by appending them to each other.
+///	</summary>
+///	<param name="ATPA">
+///	  The array which will be merged.
+///	</param>
+///	<returns>
+///	  The resulting merged array.
+///	</returns>
+{$ENDREGION}
+function MergeATPA(const ATPA: T2DPointArray): TPointArray;
+
 implementation
 
 procedure SortTPA(var TPA: TPointArray);
@@ -1644,6 +1658,21 @@ begin
   end;
 end;
 
+function MergeATPA(const ATPA: T2DPointArray): TPointArray;
+var
+  Idx, Len, TPALen: Integer;
+begin
+  Len := Length(ATPA);
+  if Len = 0 then Exit;
+  Result := Copy(ATPA[0], 0, Length(ATPA[0]));
+  for Idx := 1 to Len - 1 do
+  begin
+    TPALen := Length(Result);
+    SetLength(Result, TPALen + Length(ATPA[Idx]));
+    Move(ATPA[Idx][0], Result[TPALen], Length(ATPA[Idx]) * SizeOf(TPoint));
+  end;
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -1695,6 +1724,7 @@ initialization
     Engine.AddFunction(@ATPAArea, 'function ATPAArea(const ATPA: T2DPointArray): Integer;'); //
     Engine.AddFunction(@ATPADensity, 'function ATPADensity(const ATPA: T2DPointArray): Extended;'); //
     Engine.AddFunction(@ReverseATPA, 'procedure ReverseATPA(var ATPA: T2DPointArray);'); //
+    Engine.AddFunction(@MergeATPA, 'function MergeATPA(const ATPA: T2DPointArray): TPointArray;'); //
   end);
 {$ENDIF}
 end.
