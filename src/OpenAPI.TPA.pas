@@ -703,6 +703,73 @@ procedure SortTPAByColumn(var TPA: TPointArray);
 {$ENDREGION}
 procedure OffsetATPA(var ATPA: T2DPointArray; const XOffset, YOffset: Integer);
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Returns the boundaries of <paramref name="ATPA" /> as a <see cref="OpenAPI.Globals|TBox">TBox</see>.
+///	</summary>
+///	<param name="ATPA">
+///	  The arrays which will be processed.
+///	</param>
+///	<returns>
+///	  The smallest box that will encapsulate all points in <paramref name="ATPA" />.
+///	</returns>
+{$ENDREGION}
+function ATPABounds(const ATPA: T2DPointArray): TBox;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Determines the dimensions of the smallest box which can encase all of the points in
+///	  <paramref name="ATPA" />.
+///	</summary>
+///	<param name="ATPA">
+///	  The arrays to evaluate.
+///	</param>
+///	<param name="Width">
+///	  The outputted width.
+///	</param>
+///	<param name="Height">
+///	  The outputted height.
+///	</param>
+{$ENDREGION}
+procedure ATPADimensions(const ATPA: T2DPointArray; out Width, Height: Integer);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Returns the area of the smallest box that can encase all of the points in
+///	  <paramref name="ATPA" />.
+///	</summary>
+///	<param name="ATPA">
+///	  The arrays to evaluate.
+///	</param>
+///	<returns>
+///	  The area of <paramref name="ATPA" />.
+///	</returns>
+{$ENDREGION}
+function ATPAArea(const ATPA: T2DPointArray): Integer;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Returns the density of the points within the area of <paramref name="ATPA" />.
+///	</summary>
+///	<param name="ATPA">
+///	  The arrays to evaluate.
+///	</param>
+///	<returns>
+///	  The density of <paramref name="ATPA" />.
+///	</returns>
+{$ENDREGION}
+function ATPADensity(const ATPA: T2DPointArray): Extended;
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Reverses the order of <paramref name="ATPA" />.
+///	</summary>
+///	<param name="ATPA">
+///	  The array which will be reversed in order.
+///	</param>
+{$ENDREGION}
+procedure ReverseATPA(var ATPA: T2DPointArray);
+
 implementation
 
 procedure SortTPA(var TPA: TPointArray);
@@ -1497,6 +1564,86 @@ begin
     OffsetTPA(ATPA[Idx], XOffset, YOffset);
 end;
 
+function ATPABounds(const ATPA: T2DPointArray): TBox;
+var
+  Empty: Boolean;
+  Idx, Len, IdxTPA, LenTPA: Integer;
+  TPA: TPointArray;
+  Point: TPoint;
+begin
+  Empty := True;
+  Len := Length(ATPA);
+  if Len = 0 then Exit;
+  for Idx := 0 to Len - 1 do
+  begin
+    TPA := ATPA[Idx];
+    LenTPA := Length(TPA);
+    if LenTPA = 0 then Continue;
+    with Result do
+    begin
+      Point := TPA[0];
+      if Empty then
+      begin
+        X1 := Point.X; Y1 := Point.Y;
+        X2 := Point.X; Y2 := Point.Y;
+        Empty := False;
+      end;
+      for IdxTPA := 0 to LenTPA - 1 do
+      begin
+        Point := TPA[IdxTPA];
+        if X1 > Point.X then X1 := Point.X else
+          if X2 < Point.X then X2 := Point.X;
+        if Y1 > Point.Y then Y1 := Point.Y else
+          if Y2 < Point.Y then Y2 := Point.Y;
+      end;
+    end;
+  end;
+end;
+
+procedure ATPADimensions(const ATPA: T2DPointArray; out Width, Height: Integer);
+var
+  Box: TBox;
+begin
+  Box := ATPABounds(ATPA);
+  Width := Box.X2 - Box.X1 + 1;
+  Height := Box.Y2 - Box.Y1 + 1;
+end;
+
+function ATPAArea(const ATPA: T2DPointArray): Integer;
+var
+  Width, Height: Integer;
+begin
+  ATPADimensions(ATPA, Width, Height);
+  Result := Width * Height;
+end;
+
+function ATPADensity(const ATPA: T2DPointArray): Extended;
+var
+  i, l, Count: Integer;
+begin
+  Count := 0;
+  l := Length(ATPA);
+  for i := 0 to l - 1 do
+    Inc(Count, Length(ATPA[i]));
+  Result := ATPAArea(ATPA) / Count;
+end;
+
+procedure ReverseATPA(var ATPA: T2DPointArray);
+var
+  Points: TPointArray;
+  Idx, Hi, Mid: Integer;
+begin
+  Hi := High(ATPA);
+  if Hi < 1 then Exit;
+  Mid := Hi mod 2;
+  for Idx := 0 to Mid do
+  begin
+    Points := ATPA[Idx];
+    ATPA[Idx] := ATPA[Hi - Idx];
+    ATPA[Hi - Idx] := Points;
+  end;
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -1543,6 +1690,11 @@ initialization
     Engine.AddFunction(@SortTPAByRow, 'procedure SortTPAByRow(var TPA: TPointArray);'); //
     Engine.AddFunction(@SortTPAByColumn, 'procedure SortTPAByColumn(var TPA: TPointArray);');
     Engine.AddFunction(@OffsetATPA, 'procedure OffsetATPA(var ATPA: T2DPointArray; const XOffset, YOffset: Integer);'); //
+    Engine.AddFunction(@ATPABounds, 'function ATPABounds(const ATPA: T2DPointArray): TBox;'); //
+    Engine.AddFunction(@ATPADimensions, 'procedure ATPADimensions(const ATPA: T2DPointArray; out Width, Height: Integer);'); //
+    Engine.AddFunction(@ATPAArea, 'function ATPAArea(const ATPA: T2DPointArray): Integer;'); //
+    Engine.AddFunction(@ATPADensity, 'function ATPADensity(const ATPA: T2DPointArray): Extended;'); //
+    Engine.AddFunction(@ReverseATPA, 'procedure ReverseATPA(var ATPA: T2DPointArray);'); //
   end);
 {$ENDIF}
 end.
