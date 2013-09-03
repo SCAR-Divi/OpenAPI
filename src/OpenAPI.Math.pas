@@ -75,6 +75,42 @@ function InCircle(const X, Y, CenterX, CenterY, Radius: Integer): Boolean; inlin
 {$ENDREGION}
 function RndBoxPoint(const Box: TBox): TPoint;
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Checks if a point falls inside of a triangle.
+///	</summary>
+///	<param name="X">
+///	  The x-coordinate of the point to check.
+///	</param>
+///	<param name="Y">
+///	  The y-coordinate of the point to check.
+///	</param>
+///	<param name="X1">
+///	  The x-coordinate of the triangle's first corner.
+///	</param>
+///	<param name="Y1">
+///	  The y-coordinate of the triangle's first corner.
+///	</param>
+///	<param name="X2">
+///	  The x-coordinate of the triangle's second corner.
+///	</param>
+///	<param name="Y2">
+///	  The y-coordinate of the triangle's second corner.
+///	</param>
+///	<param name="X3">
+///	  The x-coordinate of the triangle's third corner.
+///	</param>
+///	<param name="Y3">
+///	  The y-coordinate of the triangle's third corner.
+///	</param>
+///	<returns>
+///	  True if the point (<paramref name="X" />, <paramref name="Y" />) falls inside of the triangle
+///	  specified by (<paramref name="X1" />, <paramref name="Y1" />), (<paramref name="X2" />,
+///	  <paramref name="Y2" />) and (<paramref name="X3" />, <paramref name="Y3" />).
+///	</returns>
+{$ENDREGION}
+function InTriangle(const X, Y, X1, Y1, X2, Y2, X3, Y3: Integer): Boolean; inline;
+
 implementation
 
 function Distance(const X1, Y1, X2, Y2: Integer): Extended;
@@ -108,6 +144,16 @@ begin
   Result.Y := Round(Rnd) div Round(Width) + Box.Y1;
 end;
 
+function InTriangle(const X, Y, X1, Y1, X2, Y2, X3, Y3: Integer): Boolean; inline;
+var
+  A, B, C: Integer;
+begin
+  A := (Y - Y1) * (X2 - X1) - (X - X1) * (Y2 - Y1);
+  B := (Y - Y3) * (X1 - X3) - (X - X3) * (Y1 - Y3);
+  C := (Y - Y2) * (X3 - X2) - (X - X2) * (Y3 - Y2);
+  Result := ((A <> 0) and ((A < 0) = (B < 0)) and ((B < 0) = (C < 0)));
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -116,6 +162,7 @@ initialization
     Engine.AddFunction(@Distance, 'function Distance(const X1, Y1, X2, Y2: Integer): Extended;'); //
     Engine.AddFunction(@InCircle, 'function InCircle(const X, Y, CX, CY, R: Integer): Boolean;'); //
     Engine.AddFunction(@RndBoxPoint, 'function RndBoxPoint(const Box: TBox): TPoint;');
+    Engine.AddFunction(@InTriangle, 'function InTriangle(const X, Y, X1, Y1, X2, Y2, X3, Y3: Integer): Boolean;'); //
   end);
 {$ENDIF}
 end.
