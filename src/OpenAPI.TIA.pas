@@ -13,7 +13,7 @@ uses
 
   {$IFDEF EXPORTS}uPSComponent, uEngine_PascalScript,{$ENDIF}
 
-  OpenAPI.Globals;
+  OpenAPI.Types;
 
 {$REGION 'Documentation'}
 ///	<summary>

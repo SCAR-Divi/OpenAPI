@@ -1,7 +1,7 @@
 {$REGION 'Documentation'}
 ///	<summary>
 ///	  This namespace contains all functions relating to
-///	  <see cref="OpenAPI.Globals|TPointArray">TPointArrays</see>.
+///	  <see cref="OpenAPI.Types|TPointArray">TPointArrays</see>.
 ///	</summary>
 {$ENDREGION}
 unit OpenAPI.TPA;
@@ -15,7 +15,7 @@ uses
 
   {$IFDEF EXPORTS}uPSComponent, uEngine_PascalScript,{$ENDIF}
 
-  OpenAPI.Globals;
+  OpenAPI.Types;
 
 type
   {$REGION 'Documentation'}
@@ -59,7 +59,7 @@ procedure SortTPAEx(var TPA: TPointArray; const Point: TPoint);
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Combines two <see cref="OpenAPI.Globals|TPointArray">TPointArrays</see> by appending one to
+///	  Combines two <see cref="OpenAPI.Types|TPointArray">TPointArrays</see> by appending one to
 ///	  the other and returning the resulting array.
 ///	</summary>
 ///	<param name="TPA1">
@@ -119,7 +119,7 @@ procedure OffsetTPA(var TPA: TPointArray; const XOffset, YOffset: Integer); inli
 ///	</returns>
 ///	<remarks>
 ///	  This function is used to create copies of
-///	  <see cref="OpenAPI.Globals|TPointArray">TPointArrays</see> as arrays are passed by reference
+///	  <see cref="OpenAPI.Types|TPointArray">TPointArrays</see> as arrays are passed by reference
 ///	  and cannot be duplicated by assignment.
 ///	</remarks>
 ///	<seealso cref="CopyTPAEx" />
@@ -171,7 +171,7 @@ function TPAToStr(const TPA: TPointArray): string;
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Converts a string to a <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
+///	  Converts a string to a <see cref="OpenAPI.Types|TPointArray">TPointArray</see>.
 ///	</summary>
 ///	<param name="Str">
 ///	  The string containing the points.
@@ -192,9 +192,9 @@ function TPAToStr(const TPA: TPointArray): string;
 ///	    as many times as possible, giving back as needed (greedy) «*»<br />Match the regular
 ///	    expression below and capture its match into backreference number 2 «(-?\d+)»<br />    Match
 ///	    the character “-” literally «-?»<br />        Between zero and one times, as many times as
-///	    possible, giving back as needed (greedy) «?»<br />    Match a single digit 0..9 «\d+»
-///	    <br />        Between one and unlimited times, as many times as possible, giving back as
-///	    needed (greedy) «+»
+///	    possible, giving back as needed (greedy) «?»<br />    Match a single digit 0..9 «\d+» <br />
+///	            Between one and unlimited times, as many times as possible, giving back as needed
+///	    (greedy) «+»
 ///	  </note>
 ///	</remarks>
 {$ENDREGION}
@@ -368,7 +368,8 @@ function TPAPopEx(var TPA: TPointArray; const Front: Boolean): TPoint;
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Returns the boundaries of <paramref name="TPA" /> as a <see cref="OpenAPI.Globals|TBox">TBox</see>.
+///	  Returns the boundaries of <paramref name="TPA" /> as a
+///	  <see cref="OpenAPI.Types|TBox">TBox</see>.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The array which will be processed.
@@ -487,7 +488,7 @@ procedure TPAReplace(var TPA: TPointArray; const OldPoint, NewPoint: TPoint);
 ///	</param>
 ///	<returns>
 ///	  The resulting array of points with <paramref name="XValues" /> and <paramref name="YValues" />
-///	   as coordinate components.
+///	  as coordinate components.
 ///	</returns>
 ///	<exception cref="ETPAException">
 ///	  If the length of <paramref name="XValues" /> does not equal that of <paramref name="YValues" />
@@ -515,7 +516,8 @@ procedure TPAUnzip(const TPA: TPointArray; out XValues, YValues: TIntArray);
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Calculates the mean of the x- and y coordinates of <paramref name="TPA" /> and returns them as a TPoint.
+///	  Calculates the mean of the x- and y coordinates of <paramref name="TPA" /> and returns them
+///	  as a TPoint.
 ///	</summary>
 ///	<param name="TPA">
 ///	  The array to process.
@@ -531,7 +533,7 @@ function TPAMean(const TPA: TPointArray): TPoint; inline;
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Generates a random <see cref="OpenAPI.Globals|TPointArray">TPointArray</see>.
+///	  Generates a random <see cref="OpenAPI.Types|TPointArray">TPointArray</see>.
 ///	</summary>
 ///	<param name="Count">
 ///	  The number of items in the resulting array.
@@ -636,8 +638,9 @@ function TPAInsert(var TPA: TPointArray; const Index: Integer; const Point: TPoi
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Deletes a <see cref="OpenAPI.Globals|TPointArray" /> from a
-///	  <see cref="OpenAPI.Globals|T2DPointArray" /> at a given <paramref name="Index" />.
+///	  Deletes a <see cref="OpenAPI.Types|TPointArray">TPointArray</see> from a
+///	  <see cref="OpenAPI.Types|T2DPointArray">T2DPointArray</see> at a given
+///	  <paramref name="Index" />.
 ///	</summary>
 ///	<param name="ATPA">
 ///	  The array that will be modified.
@@ -705,7 +708,8 @@ procedure OffsetATPA(var ATPA: T2DPointArray; const XOffset, YOffset: Integer);
 
 {$REGION 'Documentation'}
 ///	<summary>
-///	  Returns the boundaries of <paramref name="ATPA" /> as a <see cref="OpenAPI.Globals|TBox">TBox</see>.
+///	  Returns the boundaries of <paramref name="ATPA" /> as a
+///	  <see cref="OpenAPI.Types|TBox">TBox</see>.
 ///	</summary>
 ///	<param name="ATPA">
 ///	  The arrays which will be processed.
@@ -773,7 +777,7 @@ procedure ReverseATPA(var ATPA: T2DPointArray);
 {$REGION 'Documentation'}
 ///	<summary>
 ///	  Merges all arrays in <paramref name="ATPA" /> into a single
-///	  <see cref="OpenAPI.Globals|TPointArray" /> by appending them to each other.
+///	  <see cref="OpenAPI.Types|TPointArray">TPointArray</see> by appending them to each other.
 ///	</summary>
 ///	<param name="ATPA">
 ///	  The array which will be merged.
@@ -785,6 +789,9 @@ procedure ReverseATPA(var ATPA: T2DPointArray);
 function MergeATPA(const ATPA: T2DPointArray): TPointArray;
 
 implementation
+
+uses
+  OpenAPI.Globals;
 
 procedure SortTPA(var TPA: TPointArray);
 begin
