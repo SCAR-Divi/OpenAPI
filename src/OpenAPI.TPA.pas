@@ -1146,11 +1146,11 @@ begin
           if not Checked[IdxCheck] then
           begin
             PtCheck := Points[IdxCheck];
-            XDiff := PtCheck.X - Pt.X;
+            XDiff := Abs(PtCheck.X - Pt.X);
             // If the next point has an X distance larger than the allowed distance, all of the following
             // points are out of range, as the points were sorted by increasing X coordinate.
             if XDiff > XMax then Break;
-            YDiff := PtCheck.Y - Pt.Y;
+            YDiff := Abs(PtCheck.Y - Pt.Y);
             if (XDiff <= XMax) and (YDiff <= YMax) then
             begin
               Active.Push(PtCheck);
