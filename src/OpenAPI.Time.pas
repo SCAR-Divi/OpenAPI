@@ -30,13 +30,12 @@ type
   private
     FFrequency: Int64;
     FStart: Int64;
-    FLast: Int64;
-    FElapsed: Extended;
     FCount: Integer;
     FIvals: TExtArray;
     FActive: Boolean;
-    function GetIvalMean: Extended;
+    function GetMean: Extended;
     function GetIvals(const Idx: Integer): Extended;
+    function GetTotal: Extended;
   public
     {$REGION 'Documentation'}
     ///	<summary>
@@ -47,42 +46,24 @@ type
 
     {$REGION 'Documentation'}
     ///	<summary>
-    ///	  Startes/resets the chrono instance. Elapsed time will be measured from the point where
-    ///	  this method was called. All previously measured intervals are erased when calling this
-    ///	  method.
-    ///	</summary>
-    {$ENDREGION}
-    procedure Start;
-
-    {$REGION 'Documentation'}
-    ///	<summary>
-    ///	  Marks the time elapsed since the last marking, with the call to
-    ///	  <see cref="Start">Start</see>being the first mark. The interval will be stored internally
-    ///	  as well as being returned.
+    ///	  Sets a time marker. When no time is being recorded, this will initiate a measurement. If
+    ///	  the object tis already been activated, it will record the time interval since the last
+    ///	  time <see cref="Mark" /> was called and deactivate the object until <see cref="Mark" />
+    ///	  is called again.
     ///	</summary>
     ///	<returns>
-    ///	  The time elapsed since the last mark.
+    ///	  -1 if <see cref="Mark" /> is called to initiate a measurement or the elapsed time since a
+    ///	  measurement was initiated.
     ///	</returns>
     {$ENDREGION}
     function Mark: Extended;
 
     {$REGION 'Documentation'}
     ///	<summary>
-    ///	  Stops measuring the elapsed time and returns the time elapsed since the start, as well as
-    ///	  storing the last interval.
+    ///	  Resets the chrono instance. This erases all recorded data.
     ///	</summary>
     {$ENDREGION}
-    function Stop: Extended;
-
-    {$REGION 'Documentation'}
-    ///	<summary>
-    ///	  Returns the amount of time elapsed since <see cref="Start">Start</see> was called.
-    ///	</summary>
-    ///	<returns>
-    ///	  The elapsed time.
-    ///	</returns>
-    {$ENDREGION}
-    function Check: Extended;
+    procedure Reset;
 
     {$REGION 'Documentation'}
     ///	<summary>
@@ -112,6 +93,9 @@ type
     ///	<value>
     ///	  The requested interval.
     ///	</value>
+    ///	<exception cref="EChronoException">
+    ///	  If the index is out of bounds.
+    ///	</exception>
     {$ENDREGION}
     property Ivals[const Idx: Integer]: Extended read GetIvals;
 
@@ -120,18 +104,17 @@ type
     ///	  The arithmetic mean of all measured intervals.
     ///	</summary>
     {$ENDREGION}
-    property IvalMean: Extended read GetIvalMean;
+    property Mean: Extended read GetMean;
 
     {$REGION 'Documentation'}
     ///	<summary>
-    ///	  The time elapsed during the last measurement from <see cref="Start">Start</see> to
-    ///	  <see cref="Stop">Stop</see>.
+    ///	  Returns the total amount of time elapsed curing all recorded intervals.
     ///	</summary>
     ///	<value>
-    ///	  The elapsed time or -1 if the object has not been started and stopped before.
+    ///	  The total elapsed time.
     ///	</value>
     {$ENDREGION}
-    property Elapsed: Extended read FElapsed;
+    property Total: Extended read GetTotal;
   end;
 
 implementation
@@ -143,24 +126,13 @@ uses
 
 { TChrono }
 
-function TChrono.Check: Extended;
-var
-  Counter: Int64;
-begin
-  if not FActive then
-    raise EChronoException.Create('Chrono not active');
-  Result := (FStart - Counter) / FFrequency * 1000;
-end;
-
 constructor TChrono.Create;
 begin
-  FActive := False;
-  FElapsed := -1;
-  SetLength(FIvals, 0);
+  Reset;
   QueryPerformanceFrequency(FFrequency);
 end;
 
-function TChrono.GetIvalMean: Extended;
+function TChrono.GetMean: Extended;
 begin
   Result := TEAMean(FIvals);
 end;
@@ -172,42 +144,35 @@ begin
   Result := FIvals[Idx];
 end;
 
+function TChrono.GetTotal: Extended;
+begin
+  Result := TEASum(FIvals);
+end;
+
 function TChrono.Mark: Extended;
 var
   Counter: Int64;
 begin
-  QueryPerformanceCounter(Counter);
-  SetLength(FIvals, FCount + 1);
-  FIvals[FCount] := (Counter - FLast) / FFrequency * 1000;
-  Inc(FCount);
-  FLast := Counter;
+  if FActive then
+  begin
+    QueryPerformanceCounter(Counter);
+    Result := (Counter - FStart) / FFrequency * 1000;
+    SetLength(FIvals, FCount + 1);
+    FIvals[FCount] := Result;
+    Inc(FCount);
+    FActive := False;
+  end else begin
+    FActive := True;
+    Result := -1;
+    QueryPerformanceCounter(FStart);
+  end;
 end;
 
-procedure TChrono.Start;
+procedure TChrono.Reset;
 begin
-  FElapsed := 0;
+  FActive := False;
   SetLength(FIvals, 0);
   FCount := 0;
-  FActive := True;
-  QueryPerformanceCounter(FStart);
-  FLast := FStart;
-end;
-
-function TChrono.Stop: Extended;
-var
-  Counter: Int64;
-begin
-  if not FActive then
-    raise EChronoException.Create('Chrono not active');
-  QueryPerformanceCounter(Counter);
-  // Set last interval
-  SetLength(FIvals, FCount + 1);
-  FIvals[FCount] := (Counter - FLast) / FFrequency * 1000;
-  Inc(FCount);
-  // Determine total elapsed time
-  FElapsed := (Counter - FStart) / FFrequency * 1000;
-  Result := FElapsed;
-  FActive := False;
 end;
 
 end.
