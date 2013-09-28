@@ -111,6 +111,40 @@ function RndBoxPoint(const Box: TBox): TPoint;
 {$ENDREGION}
 function InTriangle(const X, Y, X1, Y1, X2, Y2, X3, Y3: Integer): Boolean; inline;
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Clamps <paramref name="Value" /> between <paramref name="Min" /> and <paramref name="Max" />,
+///	  if <paramref name="Min" /> is smaller than or equal to <paramref name="Max" />.
+///	</summary>
+///	<param name="Value">
+///	  The array which will be clamped between <paramref name="Min" /> and <paramref name="Max" />.
+///	</param>
+///	<param name="Min">
+///	  The lower bound for the values.
+///	</param>
+///	<param name="Max">
+///	  The upper bound for the values.
+///	</param>
+{$ENDREGION}
+procedure ClampInt(var Value: Integer; const Min, Max: Integer);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Clamps <paramref name="Value" /> between <paramref name="Min" /> and <paramref name="Max" />,
+///	  if <paramref name="Min" /> is smaller than or equal to <paramref name="Max" />.
+///	</summary>
+///	<param name="Value">
+///	  The array which will be clamped between <paramref name="Min" /> and <paramref name="Max" />.
+///	</param>
+///	<param name="Min">
+///	  The lower bound for the values.
+///	</param>
+///	<param name="Max">
+///	  The upper bound for the values.
+///	</param>
+{$ENDREGION}
+procedure ClampExt(var Value: Extended; const Min, Max: Extended);
+
 implementation
 
 function Distance(const X1, Y1, X2, Y2: Integer): Extended;
@@ -154,6 +188,24 @@ begin
   Result := ((A <> 0) and ((A < 0) = (B < 0)) and ((B < 0) = (C < 0)));
 end;
 
+procedure ClampInt(var Value: Integer; const Min, Max: Integer);
+begin
+  if Min <= Max then
+    if Min > Value then
+      Value := Min
+    else if Max < Value then
+      Value := Max;
+end;
+
+procedure ClampExt(var Value: Extended; const Min, Max: Extended);
+begin
+  if Min <= Max then
+    if Min > Value then
+      Value := Min
+    else if Max < Value then
+      Value := Max;
+end;
+
 initialization
   // Functions documented at wiki.scar-divi.com are marked with an empty comment
 {$IFDEF EXPORTS}
@@ -163,6 +215,8 @@ initialization
     Engine.AddFunction(@InCircle, 'function InCircle(const X, Y, CX, CY, R: Integer): Boolean;'); //
     Engine.AddFunction(@RndBoxPoint, 'function RndBoxPoint(const Box: TBox): TPoint;');
     Engine.AddFunction(@InTriangle, 'function InTriangle(const X, Y, X1, Y1, X2, Y2, X3, Y3: Integer): Boolean;'); //
+    Engine.AddFunction(@ClampInt, 'procedure ClampInt(var Value: Integer; const Min, Max: Integer);');
+    Engine.AddFunction(@ClampExt, 'procedure ClampExt(var Value: Extended; const Min, Max: Extended);');
   end);
 {$ENDIF}
 end.

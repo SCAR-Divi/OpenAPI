@@ -28,23 +28,58 @@ uses
 {$ENDREGION}
 function TIAToStr(const TIA: TIntArray): string;
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Clamps <paramref name="TIA" /> between <paramref name="Min" /> and <paramref name="Max" />,
+///	  if <paramref name="Min" /> is smaller than or equal to <paramref name="Max" />.
+///	</summary>
+///	<param name="TIA">
+///	  The array which will be clamped between <paramref name="Min" /> and <paramref name="Max" />.
+///	</param>
+///	<param name="Min">
+///	  The lower bound for the values.
+///	</param>
+///	<param name="Max">
+///	  The upper bound for the values.
+///	</param>
+{$ENDREGION}
+procedure ClampTIA(var TIA: TIntArray; const Min, Max: Integer);
+
 implementation
+
+uses
+  OpenAPI.Math;
 
 function TIAToStr(const TIA: TIntArray): string;
 var
-  CurPtr: PInteger;
+  ValPtr: PInteger;
   Idx, Hi: Integer;
 begin
   Hi := High(TIA);
   if Hi < 0 then Exit('');
-  CurPtr := @TIA[0];
+  ValPtr := @TIA[0];
   Result := '';
   for Idx := 0 to Hi do
   begin
-    Result := Result + IntToStr(CurPtr^);
+    Result := Result + IntToStr(ValPtr^);
     if Idx <> Hi then
       Result := Result + ',';
-    Inc(CurPtr);
+    Inc(ValPtr);
+  end;
+end;
+
+procedure ClampTIA(var TIA: TIntArray; const Min, Max: Integer);
+var
+  ValPtr: PInteger;
+  Idx, Hi: Integer;
+begin
+  Hi := High(TIA);
+  if Hi < 0 then Exit;
+  ValPtr := @TIA[0];
+  for Idx := 0 to Hi do
+  begin
+    ClampInt(ValPtr^, Min, Max);
+    Inc(ValPtr);
   end;
 end;
 
@@ -54,6 +89,7 @@ initialization
   TExportMngr_PS.Instance['Functions'].Add(procedure(const Engine: TPSScript)
   begin
     Engine.AddFunction(@TIAToStr, 'function TIAToStr(const TIA: TIntArray): string;'); //
+    Engine.AddFunction(@ClampTIA, 'procedure ClampTIA(var TIA: TIntArray; const Min, Max: Integer);');
   end);
 {$ENDIF}
 end.
