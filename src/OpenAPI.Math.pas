@@ -117,7 +117,7 @@ function InTriangle(const X, Y, X1, Y1, X2, Y2, X3, Y3: Integer): Boolean; inlin
 ///	  if <paramref name="Min" /> is smaller than or equal to <paramref name="Max" />.
 ///	</summary>
 ///	<param name="Value">
-///	  The array which will be clamped between <paramref name="Min" /> and <paramref name="Max" />.
+///	  The value which will be clamped between <paramref name="Min" /> and <paramref name="Max" />.
 ///	</param>
 ///	<param name="Min">
 ///	  The lower bound for the values.
@@ -134,7 +134,7 @@ procedure ClampInt(var Value: Integer; const Min, Max: Integer);
 ///	  if <paramref name="Min" /> is smaller than or equal to <paramref name="Max" />.
 ///	</summary>
 ///	<param name="Value">
-///	  The array which will be clamped between <paramref name="Min" /> and <paramref name="Max" />.
+///	  The value which will be clamped between <paramref name="Min" /> and <paramref name="Max" />.
 ///	</param>
 ///	<param name="Min">
 ///	  The lower bound for the values.
