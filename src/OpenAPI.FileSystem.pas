@@ -7,8 +7,45 @@ unit OpenAPI.FileSystem;
 
 interface
 
+{$IFDEF EXPORTS}
 uses
-  {$IFDEF EXPORTS}uPSComponent, uEngine_PascalScript;{$ENDIF}
+  uPSComponent, uEngine_PascalScript;
+{$ENDIF}
+
+type
+  {$REGION 'Documentation'}
+  ///	<summary>
+  ///	  The base class for various file formats.
+  ///	</summary>
+  {$ENDREGION}
+  TFile = class abstract
+
+    {$REGION 'Documentation'}
+    ///	<summary>
+    ///	  Loads a file into the object.
+    ///	</summary>
+    ///	<param name="Path">
+    ///	  The path to load the file from.
+    ///	</param>
+    ///	<returns>
+    ///	  True if the file was loaded successfully.
+    ///	</returns>
+    {$ENDREGION}
+    function LoadFromFile(const Path: string): Boolean; virtual;
+
+    {$REGION 'Documentation'}
+    ///	<summary>
+    ///	  Saves the data in the object to a file.
+    ///	</summary>
+    ///	<param name="Path">
+    ///	  The path to save the file to.
+    ///	</param>
+    ///	<returns>
+    ///	  True if the file was saved successfully.
+    ///	</returns>
+    {$ENDREGION}
+    function SaveToFile(const Path: string): Boolean; virtual; abstract;
+  end;
 
 {$REGION 'Documentation'}
 ///	<summary>
@@ -85,6 +122,13 @@ implementation
 
 uses
   System.SysUtils, System.IOUtils, WinApi.Windows;
+
+{ TFile }
+
+function TFile.LoadFromFile(const Path: string): Boolean;
+begin
+  Result := FileExists(Path);
+end;
 
 function IsValidPath(const Path: string): Boolean;
 begin

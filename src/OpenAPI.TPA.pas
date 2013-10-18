@@ -9,9 +9,7 @@ unit OpenAPI.TPA;
 interface
 
 uses
-  System.Types, System.Math, System.SysUtils,
-
-  PerlRegEx,
+  System.Types, System.SysUtils,
 
   {$IFDEF EXPORTS}uPSComponent, uEngine_PascalScript,{$ENDIF}
 
@@ -791,6 +789,10 @@ function MergeATPA(const ATPA: T2DPointArray): TPointArray;
 implementation
 
 uses
+  System.Math, Generics.Collections,
+
+  PerlRegEx,
+
   OpenAPI.Globals;
 
 procedure SortTPA(var TPA: TPointArray);
@@ -1040,7 +1042,7 @@ var
   Points: TPointArray;
   Checked: TBoolArray;
   // TODO: Investigate Stack vs Queue performance (as stack checks points in reverse order)
-  Active: TSimpleStack<TPoint>;
+  Active: TStack<TPoint>;
   Pt, PtCheck: TPoint;
 begin
   // Setup
@@ -1054,54 +1056,58 @@ begin
   SetLength(Result, Len);
   ResPos := 0;
   Idx := 0;
-  Active.Setup;
-  // Start sweep
-  while Idx < Len do
-  begin
-    if not Checked[Idx] then
+  Active := TStack<TPoint>.Create;
+  try
+    // Start sweep
+    while Idx < Len do
     begin
-      // Init new result array
-      SetLength(Result[ResPos], 1);
-      Pt := Points[Idx];
-      Result[ResPos][0] := Pt;
-      ResAPos := 1;
-      Checked[Idx] := True;
-      Active.Push(Pt);
-      // Process current point
-      while not Active.IsEmpty do
+      if not Checked[Idx] then
       begin
-        Pt := Active.Pop;
-        IdxCheck := Idx + 1;
-        // Evaluate remaining points
-        while IdxCheck < Len do
+        // Init new result array
+        SetLength(Result[ResPos], 1);
+        Pt := Points[Idx];
+        Result[ResPos][0] := Pt;
+        ResAPos := 1;
+        Checked[Idx] := True;
+        Active.Push(Pt);
+        // Process current point
+        while Active.Count <> 0 do
         begin
-          if not Checked[IdxCheck] then
+          Pt := Active.Pop;
+          IdxCheck := Idx + 1;
+          // Evaluate remaining points
+          while IdxCheck < Len do
           begin
-            PtCheck := Points[IdxCheck];
-            XDiff := PtCheck.X - Pt.X;
-            // If the next point has an X distance larger than the allowed distance, all of the following
-            // points are out of range, as the points were sorted by increasing X coordinate.
-            if XDiff > Dist then Break;
-            YDiff := PtCheck.Y - Pt.Y;
-            if XDiff * XDiff + YDiff * YDiff <= DistSqr then
+            if not Checked[IdxCheck] then
             begin
-              Active.Push(PtCheck);
-              SetLength(Result[ResPos], ResAPos + 1);
-              Result[ResPos][ResAPos] := PtCheck;
-              Checked[IdxCheck] := True;
-              Inc(ResAPos);
-              if IdxCheck = Idx + 1 then
-                Inc(Idx);
+              PtCheck := Points[IdxCheck];
+              XDiff := PtCheck.X - Pt.X;
+              // If the next point has an X distance larger than the allowed distance, all of the following
+              // points are out of range, as the points were sorted by increasing X coordinate.
+              if XDiff > Dist then Break;
+              YDiff := PtCheck.Y - Pt.Y;
+              if XDiff * XDiff + YDiff * YDiff <= DistSqr then
+              begin
+                Active.Push(PtCheck);
+                SetLength(Result[ResPos], ResAPos + 1);
+                Result[ResPos][ResAPos] := PtCheck;
+                Checked[IdxCheck] := True;
+                Inc(ResAPos);
+                if IdxCheck = Idx + 1 then
+                  Inc(Idx);
+              end;
             end;
+            Inc(IdxCheck);
           end;
-          Inc(IdxCheck);
         end;
+        Inc(ResPos);
       end;
-      Inc(ResPos);
+      Inc(Idx);
     end;
-    Inc(Idx);
+    SetLength(Result, ResPos);
+  finally
+    Active.Free;
   end;
-  SetLength(Result, ResPos);
 end;
 
 function SplitTPAEx(const TPA: TPointArray; const XMax, YMax: Integer): T2DPointArray;
@@ -1109,7 +1115,7 @@ var
   Len, ResPos, ResAPos, Idx, IdxCheck, XDiff, YDiff: Integer;
   Points: TPointArray;
   Checked: TBoolArray;
-  Active: TSimpleStack<TPoint>;
+  Active: TStack<TPoint>;
   Pt, PtCheck: TPoint;
 begin
   // Setup
@@ -1122,54 +1128,58 @@ begin
   SetLength(Result, Len);
   ResPos := 0;
   Idx := 0;
-  Active.Setup;
-  // Start sweep
-  while Idx < Len do
-  begin
-    if not Checked[Idx] then
+  Active := TStack<TPoint>.Create;
+  try
+    // Start sweep
+    while Idx < Len do
     begin
-      // Init new result array
-      SetLength(Result[ResPos], 1);
-      Pt := Points[Idx];
-      Result[ResPos][0] := Pt;
-      ResAPos := 1;
-      Checked[Idx] := True;
-      Active.Push(Pt);
-      // Process current point
-      while not Active.IsEmpty do
+      if not Checked[Idx] then
       begin
-        Pt := Active.Pop;
-        IdxCheck := Idx + 1;
-        // Evaluate remaining points
-        while IdxCheck < Len do
+        // Init new result array
+        SetLength(Result[ResPos], 1);
+        Pt := Points[Idx];
+        Result[ResPos][0] := Pt;
+        ResAPos := 1;
+        Checked[Idx] := True;
+        Active.Push(Pt);
+        // Process current point
+        while Active.Count <> 0 do
         begin
-          if not Checked[IdxCheck] then
+          Pt := Active.Pop;
+          IdxCheck := Idx + 1;
+          // Evaluate remaining points
+          while IdxCheck < Len do
           begin
-            PtCheck := Points[IdxCheck];
-            XDiff := Abs(PtCheck.X - Pt.X);
-            // If the next point has an X distance larger than the allowed distance, all of the following
-            // points are out of range, as the points were sorted by increasing X coordinate.
-            if XDiff > XMax then Break;
-            YDiff := Abs(PtCheck.Y - Pt.Y);
-            if (XDiff <= XMax) and (YDiff <= YMax) then
+            if not Checked[IdxCheck] then
             begin
-              Active.Push(PtCheck);
-              SetLength(Result[ResPos], ResAPos + 1);
-              Result[ResPos][ResAPos] := PtCheck;
-              Checked[IdxCheck] := True;
-              Inc(ResAPos);
-              if IdxCheck = Idx + 1 then
-                Inc(Idx);
+              PtCheck := Points[IdxCheck];
+              XDiff := Abs(PtCheck.X - Pt.X);
+              // If the next point has an X distance larger than the allowed distance, all of the following
+              // points are out of range, as the points were sorted by increasing X coordinate.
+              if XDiff > XMax then Break;
+              YDiff := Abs(PtCheck.Y - Pt.Y);
+              if (XDiff <= XMax) and (YDiff <= YMax) then
+              begin
+                Active.Push(PtCheck);
+                SetLength(Result[ResPos], ResAPos + 1);
+                Result[ResPos][ResAPos] := PtCheck;
+                Checked[IdxCheck] := True;
+                Inc(ResAPos);
+                if IdxCheck = Idx + 1 then
+                  Inc(Idx);
+              end;
             end;
+            Inc(IdxCheck);
           end;
-          Inc(IdxCheck);
         end;
+        Inc(ResPos);
       end;
-      Inc(ResPos);
+      Inc(Idx);
     end;
-    Inc(Idx);
+    SetLength(Result, ResPos);
+  finally
+    Active.Free;
   end;
-  SetLength(Result, ResPos);
 end;
 
 procedure FillTPA(var TPA: TPointArray; const Value: TPoint);
