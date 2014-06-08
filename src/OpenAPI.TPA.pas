@@ -1666,7 +1666,7 @@ var
 begin
   Hi := High(ATPA);
   if Hi < 1 then Exit;
-  Mid := Hi mod 2;
+  Mid := Hi div 2;
   for Idx := 0 to Mid do
   begin
     Points := ATPA[Idx];
